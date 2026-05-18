@@ -1,0 +1,279 @@
+{
+  "frames": {
+    "MIRANDO/MIRANDO2.png": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 198,
+        "h": 266
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 198,
+        "h": 266
+      },
+      "sourceSize": {
+        "w": 198,
+        "h": 266
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "MIRANDO/MIRANDO3.png": {
+      "frame": {
+        "x": 0,
+        "y": 266,
+        "w": 198,
+        "h": 266
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 198,
+        "h": 266
+      },
+      "sourceSize": {
+        "w": 198,
+        "h": 266
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "MIRANDO/MIRANDO4.png": {
+      "frame": {
+        "x": 0,
+        "y": 532,
+        "w": 198,
+        "h": 266
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 198,
+        "h": 266
+      },
+      "sourceSize": {
+        "w": 198,
+        "h": 266
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "MIRANDO/MIRANDO5.png": {
+      "frame": {
+        "x": 0,
+        "y": 798,
+        "w": 198,
+        "h": 266
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 198,
+        "h": 266
+      },
+      "sourceSize": {
+        "w": 198,
+        "h": 266
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "MIRANDO/MIRANDO6.png": {
+      "frame": {
+        "x": 0,
+        "y": 1064,
+        "w": 198,
+        "h": 266
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 198,
+        "h": 266
+      },
+      "sourceSize": {
+        "w": 198,
+        "h": 266
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "MIRANDO/MIRANDO7.png": {
+      "frame": {
+        "x": 0,
+        "y": 1330,
+        "w": 198,
+        "h": 266
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 198,
+        "h": 266
+      },
+      "sourceSize": {
+        "w": 198,
+        "h": 266
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "MIRANDO/MIRANDO8.png": {
+      "frame": {
+        "x": 0,
+        "y": 1596,
+        "w": 198,
+        "h": 266
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 198,
+        "h": 266
+      },
+      "sourceSize": {
+        "w": 198,
+        "h": 266
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "MIRANDO/MIRANDO9.png": {
+      "frame": {
+        "x": 198,
+        "y": 0,
+        "w": 198,
+        "h": 266
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 198,
+        "h": 266
+      },
+      "sourceSize": {
+        "w": 198,
+        "h": 266
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "DAÑO/DAÑO1.png": {
+      "frame": {
+        "x": 396,
+        "y": 0,
+        "w": 190,
+        "h": 266
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 190,
+        "h": 266
+      },
+      "sourceSize": {
+        "w": 190,
+        "h": 266
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "DAÑO/DAÑO2.png": {
+      "frame": {
+        "x": 586,
+        "y": 0,
+        "w": 190,
+        "h": 266
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 190,
+        "h": 266
+      },
+      "sourceSize": {
+        "w": 190,
+        "h": 266
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "DAÑO/DAÑO3.png": {
+      "frame": {
+        "x": 776,
+        "y": 0,
+        "w": 190,
+        "h": 266
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 190,
+        "h": 266
+      },
+      "sourceSize": {
+        "w": 190,
+        "h": 266
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "app": "http://free-tex-packer.com",
+    "version": "0.6.7",
+    "image": "texture-1.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 966,
+      "h": 1862
+    },
+    "scale": 1
+  }
+}
