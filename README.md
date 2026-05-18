@@ -22,6 +22,8 @@ El loop del juego se sostiene a partir de la habilidad del jugador al no dejarse
 * **Entorno:** HTML5 / WebGL
 
 ---
+## Controles
+
 
 ## 📂 Estructura del Código (Arquitectura POO)
 
