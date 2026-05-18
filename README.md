@@ -4,7 +4,7 @@
 Este proyecto forma parte de la cursada de Programación de Videojuegos 1 en la Universidad Nacional de Hurlingham (UNAHUR).
 
 ---
-
+## INTEGRANTES: Alvarez Pilar y Julian Blanco
 ## 🚀 DESCRIPCION DEL JUEGO
 
 Nuestro proyecto consiste en un juego incremental inspirado por Vampire Survivors en el cual nuestro personaje jugable debe sobrevivir oleadas de enemigos siendo recompensado por sus esfuerzos, mientras los desafíos suben en intensidad.
