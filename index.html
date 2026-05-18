@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            overflow: hidden; /* Elimina las barras */
+            background-color: #1a1a1a; /* Un color oscuro para que no brille si tarda en cargar */
+            width: 100vw;
+            height: 100vh;
+        }
+
+
+        canvas {
+            display: block; /* Quita el espacio extra inferior */
+        }
+
+
+        @font-face {
+
+            font-family: "alagard";
+
+            src: url("imagenes/fx/tipografia/alagard.ttf");
+        }
+
+
+    </style>
+    </head>
+<body>
+
+<script src="js/pixi.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+
+<script src="clases/personaje.js"></script> 
+<script src="clases/balas.js"></script> 
+<script src="clases/item.js"></script> 
+<script src="clases/itemfisico.js"></script> 
+<script src="clases/impacto.js"></script> 
+<script src="clases/jugador.js"></script>
+<script src="clases/enemigo.js"></script>
+<script src="clases/sonido.js"></script>
+<script src="clases/juego.js"></script>
+
+<script>
+    const juego = new Juego();
+</script>
+
+</body>
+</html>
