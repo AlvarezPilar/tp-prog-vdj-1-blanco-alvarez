@@ -18,7 +18,6 @@ El loop del juego se sostiene a partir de la habilidad del jugador al no dejarse
 
 * **Lenguaje:** JavaScript (ES6+)
 * **Motor Gráfico:** PIXI.js
-* **Estructura:** Programación Orientada a Objetos (POO)
 * **Entorno:** HTML5 / WebGL
 
 ---
