@@ -24,6 +24,10 @@ El loop del juego se sostiene a partir de la habilidad del jugador al no dejarse
 ---
 ## Controles
 
+* ** Movimiento: WASD
+* ** Ataque: SPACE
+* ** Interfaz y pausa: ESC,P
+
 
 ## 📂 Estructura del Código (Arquitectura POO)
 
