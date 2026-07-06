@@ -2,6 +2,7 @@ class GestorSonidos {
     constructor() {
         this.bancoSonidos = {};
         this.muteado = false;
+        this.musicaMuteada = false;
         
         // Volumen
         this.volumenMusica = 0.1;
@@ -78,5 +79,12 @@ class GestorSonidos {
         if (sonido) {
             sonido.stop();
         }
+    }
+    toggleMusica() {
+
+        this.musicaMuteada = !this.musicaMuteada;
+
+        this.bancoSonidos["musicaMenu"].mute(this.musicaMuteada);
+        this.bancoSonidos["musicaPartida"].mute(this.musicaMuteada);
     }
 }

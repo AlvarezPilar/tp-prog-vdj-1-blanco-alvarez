@@ -15,6 +15,8 @@ class Juego {
         this.faseActual = 0;
         this.aliados = [];
         this.cofres = [];
+        this.modoHordaLobo = false;     // Más enemigos tras matar al lobo alfa
+        this.modoHordaInfinita = false; // oleada infinita
         this.descripcionesItems = {
         'vigor': "Aumenta la fuerza base.",
         'piedad': "Cura 20 puntos de salud.",
@@ -114,6 +116,7 @@ class Juego {
             this.barraXP_Relleno.clear();
             this.barraXP_Relleno.rect(0, 0, anchoRelleno, 12).fill(0x00CCFF); 
         };
+        
 
         ///////////////////////////////////INVENTARIO///////////////////////////
 
@@ -186,6 +189,9 @@ class Juego {
             this.texPrecision = await PIXI.Assets.load('imagenes/fx/items/iconos/precis.png');
             this.texVida = await PIXI.Assets.load('imagenes/fx/items/iconos/vida.png');
             this.texVidaMax = await PIXI.Assets.load('imagenes/fx/items/iconos/vidaMax.png');
+
+            this.texSonidoOn = await PIXI.Assets.load("imagenes/ui_menu/MUSICA/sonando.png");
+            this.texSonidoOff = await PIXI.Assets.load("imagenes/ui_menu/MUSICA/muteado.png");
             
 
             /////////////////////////       ITEMS       ///////////////////////////////////
@@ -251,6 +257,7 @@ class Juego {
             this.texturaClickParaEmpezar = await PIXI.Assets.load('imagenes/fondo_click_empezar.png');
             this.texturaMenuPausa = await PIXI.Assets.load('imagenes/ui_menu/menu_pausa.png');
             this.texturaCuadroInstrucciones = await PIXI.Assets.load('imagenes/fondo_inst.png');
+            this.texturaImagenDecorativa = await PIXI.Assets.load('imagenes/menu_estadisticas.png');
 
             //cada boton tiene una version "apretada" y "sin apretar"
             this.texJugar1 = await PIXI.Assets.load('imagenes/ui_menu/BOTONJUGAR/boton_jugar (1).png');
@@ -295,6 +302,7 @@ class Juego {
             const sheetEsqueleto0 = await PIXI.Assets.load('enemigos/ESQUELETO/texture-0.json');
             const sheetEsqueleto1 = await PIXI.Assets.load('enemigos/ESQUELETO/texture-1.json');
             this.sheetCaballo = await PIXI.Assets.load('enemigos/DUROS/CABALLO/texture.json');
+            this.sheetMago = await PIXI.Assets.load('enemigos/MAGO/texture.json');
 
             this.sheetEsqueleto = {
                 textures: {
@@ -325,7 +333,6 @@ class Juego {
 
             this.numerosDanio = []; 
             this.contenedorDanioUI = new PIXI.Container();
-            // CAMBIA ESTO: En vez de agregar al stage, agregalo al mundo
             this.mundo.addChild(this.contenedorDanioUI);
 
             this.crearMenuPausa();
@@ -352,8 +359,13 @@ class Juego {
         ///interfaz con las estadisticas del personaje apretando escape
         this.contenedorStatsUI = new PIXI.Container();
         this.contenedorStatsUI.x = 20;  
-        this.contenedorStatsUI.y = 100;  
+        this.contenedorStatsUI.y = 150;  
         this.contenedorStatsUI.visible = false; 
+
+        this.imagenDecorativa = new PIXI.Sprite(this.texturaImagenDecorativa);
+        this.imagenDecorativa.anchor.set(0.5); 
+        this.imagenDecorativa.y = 150; 
+        this.contenedorStatsUI.addChild(this.imagenDecorativa);
 
         // orden de capas de la ui
         this.pixiApp.stage.addChild(this.flechaItem);
@@ -458,30 +470,35 @@ class Juego {
             //Spawn enemigos comunes
             const jefeVivo = this.enemigos.some(en => en.esJefe && !en.muerto);
             const enemigosVivos = this.enemigos.filter(en => !en.muerto).length;
-            this.timerSpawn += ticker.elapsedMS; 
+            this.timerSpawn += ticker.elapsedMS;
 
             if (!jefeVivo) {
-                this.jefeActivo = false; 
+                this.jefeActivo = false;
+                let cooldownActual = 200;
                 
-                if (enemigosVivos < this.limiteEnemigos) {
-                    if (this.timerSpawn >= 200) { 
+                
+                if (this.modoHordaInfinita) cooldownActual = 100;
+                else if (this.modoHordaLobo) cooldownActual = 150;
+
+                let limiteActual = this.limiteEnemigos;
+                if (this.modoHordaInfinita) limiteActual = 999;
+                else if (this.modoHordaLobo) limiteActual = 100;
+
+                if (enemigosVivos < limiteActual) {
+                    if (this.timerSpawn >= cooldownActual) {
                         
-                        if (this.oleadaCaballoActiva) {
-                            let tipoElegido = '';
+                        
+                        if (this.oleadaCaballoActiva || this.modoHordaInfinita) {
+                            let rand = Math.random();
+                            let tipoElegido = 'fantasma';
+
+                            if (rand < 0.20) tipoElegido = 'lobo';
+                            else if (rand < 0.45) tipoElegido = 'esqueleto';
+                            else if (rand < 0.70) tipoElegido = 'murcielago';
+                            else tipoElegido = 'fantasma';
                             
-                            // 60% de probabilidad de murciélagos
-                            if (Math.random() < 0.60) {
-                                tipoElegido = 'murcielago';
-                            } else {
-                                // 40% restante entre fantasma y esqueleto
-                                tipoElegido = Math.random() < 0.5 ? 'fantasma' : 'esqueleto';
-                            }
-                            
-                            // spawnea uno en especifico
-                            this.spawnEnemigoUnitario(tipoElegido); 
-                            
+                            this.spawnEnemigoUnitario(tipoElegido);
                         } else {
-                            
                             this.spawnEnemigoUnitario();
                         }
                         
@@ -707,15 +724,27 @@ class Juego {
             if (en.muerto || en.vidaActual <= 0) {
                 if (en.esJefe) {
                     this.jefeActivo = false;
-                    console.log(`¡EL JEFE [${en.tipo ? en.tipo.toUpperCase() : 'BOSS'}] HA CAÍDO! La dificultad general aumenta.`);
                     
-                    // si detecta un jefe tipo caballo activa su oleada de enemigos
+                    if (en.parent) en.parent.removeChild(en);
+                    
+                    console.log(`¡EL JEFE [${en.tipo}] HA CAÍDO!`);
+                    
+                    // Al matar al lobo alfa: más enemigos
+                    if (en.tipo === 'lobo_alfa') {
+                        this.modoHordaLobo = true;
+                        this.limiteEnemigos = 60;
+                        this.faseActual = 2; 
+                        console.log("¡El Lobo Alfa cayó! Iniciando Fase 2.");
+                    }
+                    
+                    // Al matar al caballo: oleadas infinitas
                     if (en.tipo === 'caballo_maldito') {
-                        this.oleadaCaballoActiva = true;
-                        this.limiteEnemigos = this.limiteEnemigos * 2; // duplica el limite de enemigos
+                        this.modoHordaInfinita = true;
+                        this.limiteEnemigos = 9999; 
+                        console.log("¡El Caballo Maldito ha muerto! Oleadas infinitas activadas.");
                     }
                 }
-                return false; 
+                return false;
             }
 
             const dx = en.x - this.jugador.x;
@@ -737,14 +766,6 @@ class Juego {
 
             en.actualizar(this.jugador.x, this.jugador.y, delta, this.enemigos);
             return true; 
-        });
-
-        //////////////// CHEQUEO MUERTE JEFE - ESTADO DE FASE ////////////////////
-
-        this.enemigos.forEach(en => {
-            if (en.muerto && en.esJefe && this.faseActual === 0) {
-                this.faseActual = 1; 
-            }
         });
 
     } /////////////----------------TERMINA ACTUALIZACION DE ENTIDADES----------------//////////////////
@@ -961,24 +982,42 @@ class Juego {
     let tipoEnemigo = 'fantasma';
     const dado = Math.random();
 
-    if (tipoForzado) {
-        tipoEnemigo = tipoForzado;
+    if (this.modoHordaInfinita) {
         
+        tipoEnemigo = 'fantasma'; 
+        sheetElegida = this.sheetEnemigo;
+    } 
+    else if (this.modoHordaLobo) {
+        
+        if (dado < 0.6) {
+            tipoEnemigo = 'lobo';
+            sheetElegida = this.sheetLobo;
+        } else {
+            tipoEnemigo = 'esqueleto';
+            sheetElegida = this.sheetEsqueleto;
+        }
+    } 
+    
+    else if (tipoForzado) {
+        tipoEnemigo = tipoForzado;
         if (tipoForzado === 'lobo') sheetElegida = this.sheetLobo;
         else if (tipoForzado === 'esqueleto') sheetElegida = this.sheetEsqueleto;
         else if (tipoForzado === 'murcielago') sheetElegida = this.sheetMurcielago;
-        else sheetElegida = this.sheetEnemigo; // fantasma
-        
+        else if (tipoForzado === 'mago') sheetElegida = this.sheetMago;
     } else {
+
 
         /////////// FASE 1 A 5 ///////////
         if (this.faseActual >= 1) {
-            if (dado < 0.45) { 
+            if (dado < 0.30) { 
                 sheetElegida = this.sheetLobo;
                 tipoEnemigo = 'lobo';
-            } else if (dado < 0.85) { 
+            } else if (dado < 0.60) { 
                 sheetElegida = this.sheetEsqueleto;
                 tipoEnemigo = 'esqueleto';
+            } else if (dado < 0.75) { 
+                sheetElegida = this.sheetMago; 
+                tipoEnemigo = 'mago';
             } else { 
                 if (Math.random() < 0.5) {
                     sheetElegida = this.sheetEnemigo;
@@ -1048,6 +1087,9 @@ class Juego {
         const jefe = new Enemigo(x, y, sheet, datos.nombre);
 
             //estadisticas del jefe
+        jefe.tipo = datos.nombre;
+        this.jefeActivo = true;
+
         jefe.esJefe = true; 
         jefe.vida = datos.vida; 
         jefe.vidaActual = datos.vida;
@@ -1060,6 +1102,7 @@ class Juego {
 
         this.mundo.addChild(jefe);
         this.enemigos.push(jefe);
+        console.log(`Jefe spawnneado: ${datos.nombre}. Estado: jefeActivo = true`);
 
     }
     
@@ -1325,7 +1368,10 @@ class Juego {
         this.nivelActual = 1;
         this.xpActual = 0;
         this.xpNecesaria = 100;
+        this.modoHordaLobo = false;
+        this.modoHordaInfinita = false;
         this.limiteEnemigos = 25;
+        this.oleadaCaballoActiva = false;
         this.textoNivel.text = `NIVEL: ${this.nivelActual}`;
         this.actualizarBarraXP();
 
@@ -1584,12 +1630,36 @@ class Juego {
         const btnSalirP = this.crearBotonUI(this.texSalir1, this.texSalir2, () => {
             window.location.reload();
         });
+//mutear
+        console.log(this.texSonidoOn);
+        console.log(this.texSonidoOff);
+        const btnSonido = new PIXI.Sprite(this.texSonidoOn);
+
+        btnSonido.eventMode = "static";
+        btnSonido.cursor = "pointer";
+
+        btnSonido.anchor.set(0.5);
+        btnSonido.scale.set(2);
+
+
+        btnSonido.on("pointerdown", () => {
+
+            this.sonidos.toggleMusica();
+
+            btnSonido.texture = this.sonidos.musicaMuteada
+                ? this.texSonidoOff
+                : this.texSonidoOn;
+        });
+
+        ///
 
         btnContinuar.y = 0;
         btnReiniciar.y = 90;
         btnSalirP.y = 180;
+        btnSonido.x=0
+        btnSonido.y = btnSalirP.y + 120;
 
-        grupoP.addChild(btnContinuar, btnReiniciar, btnSalirP);
+        grupoP.addChild(btnContinuar, btnReiniciar, btnSalirP, btnSonido);
         grupoP.y = -140; 
         this.menuPausaUI.addChild(grupoP);
 
@@ -1642,48 +1712,53 @@ class Juego {
 
 
     actualizarEstadisticasEnPantalla() {
-        // borra los datos y vuelve a crearlos ahora actualizados
-        this.contenedorStatsUI.removeChildren();
+    this.contenedorStatsUI.removeChildren();
 
-        if (!this.jugador || !this.jugador.stats || this.enMenuPrincipal || this.eligiendoItemInicial) {
-            this.contenedorStatsUI.visible = false;
-            return;
-        }
-        const stats = this.jugador.stats;
-        
-        const listaStats = [
-            `VIDA: ${Math.round(stats.vidaActual)} / ${stats.vidaMax}`,
-            `DAÑO: ${stats.danio.toFixed(1)}`,
-            `VELOCIDAD: ${stats.velocidad.toFixed(1)}`,
-            `BALAS: ${stats.cantidadBalas}`,
-            `CADENCIA: ${(stats.cooldown / 1000).toFixed(2)}s`
-        ];
-
-        if (this.jugador.tieneAjo) {
-            listaStats.push(`DMG AJO: ${stats.danioAjo.toFixed(1)}`);
-        }
-
-        const espacioEntreLineas = 40; // espacio entre renglones
-
-        listaStats.forEach((linea, indice) => {
-            const txtStat = new PIXI.Text({
-                text: linea,
-                style: {
-                    fontFamily: 'alagard', 
-                    fontSize: 24, 
-                    fill: 0xffffff, 
-                    stroke: { color: 0x000000, width: 4 }
-                }
-            });
-            
-            
-            txtStat.anchor.set(0, 0.5);
-            txtStat.x = 0; 
-            txtStat.y = indice * espacioEntreLineas;
-
-            this.contenedorStatsUI.addChild(txtStat);
-        });
+    if (!this.jugador || !this.jugador.stats || this.enMenuPrincipal || this.eligiendoItemInicial) {
+        this.contenedorStatsUI.visible = false;
+        return;
     }
+
+    // 2. Creamos y agregamos el fondo con la escala deseada
+    const fondo = new PIXI.Sprite(this.texturaImagenDecorativa);
+    fondo.x = -50; // Posición horizontal dentro del menú
+    fondo.y = -40; // Posición vertical dentro del menú
+    
+    fondo.scale.set(0.5); 
+    
+    
+    this.contenedorStatsUI.addChild(fondo);
+
+    // 3. Agregamos los textos encima
+    const stats = this.jugador.stats;
+    const listaStats = [
+        `VIDA: ${Math.round(stats.vidaActual)} / ${stats.vidaMax}`,
+        `DAÑO: ${stats.danio.toFixed(1)}`,
+        `VELOCIDAD: ${stats.velocidad.toFixed(1)}`,
+        `BALAS: ${stats.cantidadBalas}`,
+        `CADENCIA: ${(stats.cooldown / 1000).toFixed(2)}s`
+    ];
+
+    if (this.jugador.tieneAjo) {
+        listaStats.push(`DMG AJO: ${stats.danioAjo.toFixed(1)}`);
+    }
+
+    const espacioEntreLineas = 40;
+    const offsetTextoY = 30;
+
+    listaStats.forEach((linea, indice) => {
+        const txtStat = new PIXI.Text({
+            text: linea,
+            style: { fontFamily: 'alagard', fontSize: 24, fill: 0xffffff, stroke: { color: 0x000000, width: 4 } }
+        });
+        
+        txtStat.anchor.set(0, 0.5);
+        txtStat.x = 20; // Margen izquierdo
+        txtStat.y = (indice * espacioEntreLineas) + offsetTextoY;
+
+        this.contenedorStatsUI.addChild(txtStat);
+    });
+}
 
 
     crearBotonUI(texNormal, texHover, accion) {

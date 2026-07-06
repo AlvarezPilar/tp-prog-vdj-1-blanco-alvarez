@@ -1,863 +1,863 @@
 {
   "frames": {
-    "ATAQUE/ATAQUE1.png": {
+    "DASH1.png": {
       "frame": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "ATAQUE/ATAQUE10.png": {
+    "DASH2.png": {
       "frame": {
-        "x": 0,
-        "y": 640,
-        "w": 640,
-        "h": 640
+        "x": 160,
+        "y": 0,
+        "w": 160,
+        "h": 112.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "ATAQUE/ATAQUE2.png": {
+    "DASH3.png": {
       "frame": {
-        "x": 0,
-        "y": 1280,
-        "w": 640,
-        "h": 640
+        "x": 320,
+        "y": 0,
+        "w": 160,
+        "h": 112.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "ATAQUE/ATAQUE3.png": {
+    "DASH4.png": {
       "frame": {
-        "x": 0,
-        "y": 1920,
-        "w": 640,
-        "h": 640
+        "x": 480,
+        "y": 0,
+        "w": 160,
+        "h": 112.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "ATAQUE/ATAQUE4.png": {
-      "frame": {
-        "x": 0,
-        "y": 2560,
-        "w": 640,
-        "h": 640
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 640,
-        "h": 640
-      },
-      "sourceSize": {
-        "w": 640,
-        "h": 640
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "ATAQUE/ATAQUE5.png": {
-      "frame": {
-        "x": 0,
-        "y": 3200,
-        "w": 640,
-        "h": 640
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 640,
-        "h": 640
-      },
-      "sourceSize": {
-        "w": 640,
-        "h": 640
-      },
-      "pivot": {
-        "x": 0.5,
-        "y": 0.5
-      }
-    },
-    "ATAQUE/ATAQUE6.png": {
+    "DASH5.png": {
       "frame": {
         "x": 640,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "ATAQUE/ATAQUE7.png": {
+    "DASH6.png": {
       "frame": {
-        "x": 1280,
+        "x": 800,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 160,
+        "h": 112.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "ATAQUE/ATAQUE8.png": {
+    "MUERE1.png": {
       "frame": {
-        "x": 1920,
-        "y": 0,
-        "w": 640,
-        "h": 640
+        "x": 0,
+        "y": 112.5,
+        "w": 100,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "ATAQUE/ATAQUE9.png": {
+    "MUERE10.png": {
       "frame": {
-        "x": 2560,
-        "y": 0,
-        "w": 640,
-        "h": 640
+        "x": 0,
+        "y": 250,
+        "w": 100,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "DASH/DASH1.png": {
+    "MUERE2.png": {
       "frame": {
-        "x": 3200,
-        "y": 0,
-        "w": 640,
-        "h": 640
+        "x": 0,
+        "y": 387.5,
+        "w": 100,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "DASH/DASH2.png": {
+    "MUERE3.png": {
       "frame": {
-        "x": 640,
-        "y": 640,
-        "w": 640,
-        "h": 640
+        "x": 0,
+        "y": 525,
+        "w": 100,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "DASH/DASH3.png": {
+    "MUERE4.png": {
       "frame": {
-        "x": 640,
-        "y": 1280,
-        "w": 640,
-        "h": 640
+        "x": 0,
+        "y": 662.5,
+        "w": 100,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "DASH/DASH4.png": {
+    "MUERE5.png": {
       "frame": {
-        "x": 640,
-        "y": 1920,
-        "w": 640,
-        "h": 640
+        "x": 0,
+        "y": 800,
+        "w": 100,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "DASH/DASH5.png": {
+    "MUERE6.png": {
       "frame": {
-        "x": 640,
-        "y": 2560,
-        "w": 640,
-        "h": 640
+        "x": 100,
+        "y": 112.5,
+        "w": 100,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "DASH/DASH6.png": {
+    "MUERE7.png": {
       "frame": {
-        "x": 640,
-        "y": 3200,
-        "w": 640,
-        "h": 640
+        "x": 100,
+        "y": 250,
+        "w": 100,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "IDLE/IDLE1.png": {
+    "MUERE8.png": {
       "frame": {
-        "x": 1280,
-        "y": 640,
-        "w": 640,
-        "h": 640
+        "x": 100,
+        "y": 387.5,
+        "w": 100,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "IDLE/IDLE10.png": {
+    "MUERE9.png": {
       "frame": {
-        "x": 1920,
-        "y": 640,
-        "w": 640,
-        "h": 640
+        "x": 100,
+        "y": 525,
+        "w": 100,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "IDLE/IDLE2.png": {
+    "IDLE1.png": {
       "frame": {
-        "x": 2560,
-        "y": 640,
-        "w": 640,
-        "h": 640
+        "x": 100,
+        "y": 662.5,
+        "w": 87.5,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "IDLE/IDLE3.png": {
+    "IDLE10.png": {
       "frame": {
-        "x": 3200,
-        "y": 640,
-        "w": 640,
-        "h": 640
+        "x": 100,
+        "y": 800,
+        "w": 87.5,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "IDLE/IDLE4.png": {
+    "IDLE2.png": {
       "frame": {
-        "x": 1280,
-        "y": 1280,
-        "w": 640,
-        "h": 640
+        "x": 187.5,
+        "y": 662.5,
+        "w": 87.5,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "IDLE/IDLE5.png": {
+    "IDLE3.png": {
       "frame": {
-        "x": 1280,
-        "y": 1920,
-        "w": 640,
-        "h": 640
+        "x": 187.5,
+        "y": 800,
+        "w": 87.5,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "IDLE/IDLE6.png": {
+    "IDLE4.png": {
       "frame": {
-        "x": 1280,
-        "y": 2560,
-        "w": 640,
-        "h": 640
+        "x": 275,
+        "y": 800,
+        "w": 87.5,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "IDLE/IDLE7.png": {
+    "IDLE5.png": {
       "frame": {
-        "x": 1280,
-        "y": 3200,
-        "w": 640,
-        "h": 640
+        "x": 200,
+        "y": 112.5,
+        "w": 87.5,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "IDLE/IDLE8.png": {
+    "IDLE6.png": {
       "frame": {
-        "x": 1920,
-        "y": 1280,
-        "w": 640,
-        "h": 640
+        "x": 200,
+        "y": 250,
+        "w": 87.5,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "IDLE/IDLE9.png": {
+    "IDLE7.png": {
       "frame": {
-        "x": 2560,
-        "y": 1280,
-        "w": 640,
-        "h": 640
+        "x": 200,
+        "y": 387.5,
+        "w": 87.5,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "MUERTE/MUERE1.png": {
+    "IDLE8.png": {
       "frame": {
-        "x": 3200,
-        "y": 1280,
-        "w": 640,
-        "h": 640
+        "x": 200,
+        "y": 525,
+        "w": 87.5,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "MUERTE/MUERE10.png": {
+    "IDLE9.png": {
       "frame": {
-        "x": 1920,
-        "y": 1920,
-        "w": 640,
-        "h": 640
+        "x": 275,
+        "y": 662.5,
+        "w": 87.5,
+        "h": 137.5
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 87.5,
+        "h": 137.5
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "MUERTE/MUERE2.png": {
+    "ATAQUE1.png": {
       "frame": {
-        "x": 1920,
-        "y": 2560,
-        "w": 640,
-        "h": 640
+        "x": 362.5,
+        "y": 662.5,
+        "w": 100,
+        "h": 125
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "MUERTE/MUERE3.png": {
+    "ATAQUE10.png": {
       "frame": {
-        "x": 1920,
-        "y": 3200,
-        "w": 640,
-        "h": 640
+        "x": 362.5,
+        "y": 787.5,
+        "w": 100,
+        "h": 125
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "MUERTE/MUERE4.png": {
+    "ATAQUE2.png": {
       "frame": {
-        "x": 2560,
-        "y": 1920,
-        "w": 640,
-        "h": 640
+        "x": 287.5,
+        "y": 112.5,
+        "w": 100,
+        "h": 125
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "MUERTE/MUERE5.png": {
+    "ATAQUE3.png": {
       "frame": {
-        "x": 3200,
-        "y": 1920,
-        "w": 640,
-        "h": 640
+        "x": 287.5,
+        "y": 237.5,
+        "w": 100,
+        "h": 125
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "MUERTE/MUERE6.png": {
+    "ATAQUE4.png": {
       "frame": {
-        "x": 2560,
-        "y": 2560,
-        "w": 640,
-        "h": 640
+        "x": 287.5,
+        "y": 362.5,
+        "w": 100,
+        "h": 125
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "MUERTE/MUERE7.png": {
+    "ATAQUE5.png": {
       "frame": {
-        "x": 2560,
-        "y": 3200,
-        "w": 640,
-        "h": 640
+        "x": 287.5,
+        "y": 487.5,
+        "w": 100,
+        "h": 125
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "MUERTE/MUERE8.png": {
+    "ATAQUE6.png": {
       "frame": {
-        "x": 3200,
-        "y": 2560,
-        "w": 640,
-        "h": 640
+        "x": 387.5,
+        "y": 112.5,
+        "w": 100,
+        "h": 125
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "pivot": {
         "x": 0.5,
         "y": 0.5
       }
     },
-    "MUERTE/MUERE9.png": {
+    "ATAQUE7.png": {
       "frame": {
-        "x": 3200,
-        "y": 3200,
-        "w": 640,
-        "h": 640
+        "x": 387.5,
+        "y": 237.5,
+        "w": 100,
+        "h": 125
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
       },
       "sourceSize": {
-        "w": 640,
-        "h": 640
+        "w": 100,
+        "h": 125
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "ATAQUE8.png": {
+      "frame": {
+        "x": 387.5,
+        "y": 362.5,
+        "w": 100,
+        "h": 125
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 100,
+        "h": 125
+      },
+      "sourceSize": {
+        "w": 100,
+        "h": 125
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "ATAQUE9.png": {
+      "frame": {
+        "x": 387.5,
+        "y": 487.5,
+        "w": 100,
+        "h": 125
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 100,
+        "h": 125
+      },
+      "sourceSize": {
+        "w": 100,
+        "h": 125
       },
       "pivot": {
         "x": 0.5,
@@ -871,9 +871,9 @@
     "image": "texture.png",
     "format": "RGBA8888",
     "size": {
-      "w": 3840,
-      "h": 3840
+      "w": 960,
+      "h": 938
     },
-    "scale": 1
+    "scale": 0.5
   }
 }

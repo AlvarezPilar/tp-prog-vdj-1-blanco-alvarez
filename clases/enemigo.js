@@ -10,7 +10,7 @@ class Enemigo extends PIXI.Container {
         // stats de enemigos
         const statsBase = {
             'fantasma': { escala: 1.5, animSpeed: 0.2, vida: 3, xp: 10, velocidad: 2, invertirX: true },
-            'esqueleto': { escala: 0.5, animSpeed: 0.12, vida: 5, xp: 20, velocidad: 2, invertirX: false },
+            'esqueleto': { escala: 0.5, animSpeed: 0.12, vida: 9, xp: 20, velocidad: 2, invertirX: false },
             'lobo': { escala: 2, animSpeed: 0.2, vida: 4, xp: 30, velocidad: 3, invertirX: true },  
             'murcielago': { escala: 0.5, animSpeed: 0.22, vida: 2, xp: 12, velocidad: 2.6, invertirX: false },
             'caballo_maldito': { escala: 2.2, animSpeed: 0.12, vida: 100, xp: 1200, velocidad: 3, invertirX: true }
@@ -227,6 +227,10 @@ class Enemigo extends PIXI.Container {
         if (this.muerto || this.apareciendo) return;
         
         this.vidaActual -= cantidad; 
+        if (this.tipo === 'esqueleto' && this.vidaActual <= 2) {        
+        this.velocidad = 3.5; 
+        this.sprite.tint = 0xff3333; 
+    }
         
         this.sprite.tint = 0xff0000;
         setTimeout(() => { if (this.sprite) this.sprite.tint = 0xffffff; }, 100);
