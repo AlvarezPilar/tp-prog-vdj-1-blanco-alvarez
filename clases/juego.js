@@ -14,6 +14,19 @@ class Juego {
         this.oleadaCaballoActiva = false; //espera hasta que spawnee Caballo para retener algunos enemigos y spawnear otros
         this.faseActual = 0;
         this.aliados = [];
+        this.cofres = [];
+        this.descripcionesItems = {
+        'vigor': "Aumenta la fuerza base.",
+        'piedad': "Cura 20 puntos de salud.",
+        'benevolencia': "Restaura tu salud al máximo.",
+        'frenesí': "Dispara mucho más rápido.",
+        'compañero alado': "Invoca una paloma atacante.",
+        'emanar': "Aura que daña enemigos cercanos.",
+        'foco': "Aumenta la precisión.",
+        'botas': "Aumenta tu velocidad.",
+        'prisa': "Aumenta tu velocidad.",
+        'violencia': "Más proyectiles por disparo."
+    };
         this.planDeJefes = [
     { 
         nombre: 'lobo_alfa', 
@@ -42,6 +55,7 @@ class Juego {
         this.itemObjetivo = null; // item al que lleva la flecha
         this.juegoPausado = false;
         this.contenedorSeleccionInicial = null;
+        this.contenedorCofre = null;
         this.init();
     }
 
@@ -162,6 +176,8 @@ class Juego {
             this.texIconoAjo = await PIXI.Assets.load('imagenes/fx/items/ajo/iconoajo.png');
             this.sheetPaloma = await PIXI.Assets.load('enemigos/PALOMA/texture.json');
             this.texIconoPaloma = await PIXI.Assets.load('enemigos/PALOMA/iconoPaloma.png');
+            this.sheetCofreAbriendo = await PIXI.Assets.load('imagenes/cofre/ABRIENDO/texture.json');
+            this.sheetCofreBrillando = await PIXI.Assets.load('imagenes/cofre/BRILLANDO/texture.json');
 
             this.texVeloz = await PIXI.Assets.load('imagenes/fx/items/iconos/veloz.png');
             this.texDanio = await PIXI.Assets.load('imagenes/fx/items/iconos/danio.png');
@@ -232,6 +248,7 @@ class Juego {
             ////////////////////////////       UI - MENU           ///////////////////////////////////
 
             this.texturaFondoInicio = await PIXI.Assets.load('imagenes/fondo_inicio.png');
+            this.texturaClickParaEmpezar = await PIXI.Assets.load('imagenes/fondo_click_empezar.png');
             this.texturaMenuPausa = await PIXI.Assets.load('imagenes/ui_menu/menu_pausa.png');
             this.texturaCuadroInstrucciones = await PIXI.Assets.load('imagenes/fondo_inst.png');
 
@@ -245,6 +262,7 @@ class Juego {
             this.texReiniciar = await PIXI.Assets.load('imagenes/ui_menu/BOTON REINICIO/boton_reinicio.png');
             this.texReiniciarApretado = await PIXI.Assets.load('imagenes/ui_menu/BOTON REINICIO/boton_reinicio_apretado.png');
             this.spritesheetFlechaItem = await PIXI.Assets.load('imagenes/fx/flecha/texture.json');
+            this.fondoCofre = await PIXI.Assets.load('imagenes/cofre/fondo_interfaz_cofre.png');
 
             /////////////////////////         PERSONAJE JUGABLE        /////////////////////////////
 
@@ -314,6 +332,7 @@ class Juego {
             this.crearMenuInstrucciones();
             this.crearMenuPrincipal();
             this.crearMenuSeleccionInicial();
+            this.crearInterfazCofre();
 
         } catch (e) { 
             console.error("Error cargando assets:", e); //por las dudas
@@ -423,6 +442,7 @@ class Juego {
                 }
             });
 
+
             //Camara - zoom
             this.mundo.scale.set(nivelZoom);
             let objX = (this.pixiApp.screen.width / 2) - (this.jugador.x * nivelZoom);
@@ -469,6 +489,33 @@ class Juego {
                     }
                 }
             }
+                    this.cofres.forEach(cofre => {
+            if (cofre.activado) return;
+
+            const dx = this.jugador.x - cofre.x;
+            const dy = this.jugador.y - cofre.y;
+            const distancia = Math.sqrt(dx * dx + dy * dy);
+
+            if (distancia < 40) {
+    cofre.activado = true;
+    this.juegoPausado = true;
+
+    const texturasAbrir = Object.keys(this.sheetCofreAbriendo.textures)
+        .sort()
+        .map(key => this.sheetCofreAbriendo.textures[key]);
+        
+    cofre.textures = texturasAbrir;
+    cofre.loop = false;
+    cofre.animationSpeed = 0.2;
+    cofre.play();
+
+    cofre.onComplete = () => {
+        this.abrirInterfazCofre(); // <-- LLAMA AL MÉTODO CORREGIDO
+        cofre.destroy(); // Elimina el sprite visual
+        this.cofres = this.cofres.filter(c => c !== cofre);
+    };
+}
+        });
 
             ////////////////       ACTUALIZA TICKER - ENTIDADES - FLECHA - ITEMS       //////////////////
             // Coordina el jugador tick a tick /tambien el cooldown en jugador
@@ -731,65 +778,60 @@ class Juego {
     ////////////////////        ACTUALIZAR FLECHA            /////////////////////
 
     actualizarFlecha() {
-        if (this.enMenuPrincipal || this.juegoPausado) {
+    if (this.enMenuPrincipal || this.juegoPausado) {
         this.flechaItem.visible = false;
         return;
     }
-        //si no hay items no aparece la flecha
-        if (!this.itemsMapa || this.itemsMapa.length === 0) {
-            this.itemObjetivo = null;
-            this.flechaItem.visible = false;
-            return;
-        }
 
-        //busca el item mas cercano
-        let itemMasCercano = null;
-        let distanciaMinima = Infinity;
+    // 1. Unimos ambos arreglos para buscar el objetivo más cercano
+    const objetivos = [...(this.itemsMapa || []), ...(this.cofres || [])];
 
-        this.itemsMapa.forEach(item => {
-            if (item && item.parent) {
-                const dx = item.x - this.jugador.x;
-                const dy = item.y - this.jugador.y;
-                const distancia = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distancia < distanciaMinima) { //compara distancias hasta encontrar la menor
-                    distanciaMinima = distancia;
-                    itemMasCercano = item;  //fija el item al que va a señalar
-                }
-            }
-        });
-
-        // fija el item al que va a señalar la flecha
-        this.itemObjetivo = itemMasCercano;
-
-        // si no se encontró ninguno válido, sale
-        if (!this.itemObjetivo) {
-            this.flechaItem.visible = false;
-            return;
-        }
-
-        this.flechaItem.visible = true;
-
-        // angulo hacia el objeto mas cercano
-        const dx = this.itemObjetivo.x - this.jugador.x;
-        const dy = this.itemObjetivo.y - this.jugador.y;
-        const angulo = Math.atan2(dy, dx);
-
-        //la flecha se centra en la pantalla para orbitar al jugador
-        const centroX = this.pixiApp.screen.width / 2;
-        const centroY = this.pixiApp.screen.height / 2;
-        
-        const radioOrbita = 100; 
-
-        this.flechaItem.x = centroX + Math.cos(angulo) * radioOrbita;
-        this.flechaItem.y = centroY + Math.sin(angulo) * radioOrbita;
-
-        const paso8Direcciones = Math.PI / 4; 
-        const anguloRedondeado = Math.round(angulo / paso8Direcciones) * paso8Direcciones;
-
-        this.flechaItem.anchor.set(0.5, 0.5);
-        this.flechaItem.rotation = angulo - Math.PI / 15;
+    if (objetivos.length === 0) {
+        this.flechaItem.visible = false;
+        return;
     }
+
+    let objetivoMasCercano = null;
+    let distanciaMinima = Infinity;
+
+    objetivos.forEach(obj => {
+        // Verificamos que sea un objeto válido (que esté en el mundo)
+        if (obj && (obj.parent || obj.visible)) {
+            const dx = obj.x - this.jugador.x;
+            const dy = obj.y - this.jugador.y;
+            const distancia = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distancia < distanciaMinima) {
+                distanciaMinima = distancia;
+                objetivoMasCercano = obj;
+            }
+        }
+    });
+
+    // 2. Si no hay nada, ocultar
+    if (!objetivoMasCercano) {
+        this.flechaItem.visible = false;
+        return;
+    }
+
+    this.flechaItem.visible = true;
+
+    // 3. Ángulo hacia el objetivo (usando las coordenadas del objetivo encontrado)
+    const dx = objetivoMasCercano.x - this.jugador.x;
+    const dy = objetivoMasCercano.y - this.jugador.y;
+    const angulo = Math.atan2(dy, dx);
+
+    // Mantenemos tu lógica de órbita
+    const centroX = this.pixiApp.screen.width / 2;
+    const centroY = this.pixiApp.screen.height / 2;
+    const radioOrbita = 100; 
+
+    this.flechaItem.x = centroX + Math.cos(angulo) * radioOrbita;
+    this.flechaItem.y = centroY + Math.sin(angulo) * radioOrbita;
+
+    this.flechaItem.anchor.set(0.5, 0.5);
+    this.flechaItem.rotation = angulo - Math.PI / 15;
+}
 
 
     ////////////////////        ACTUALIZAR ITEMS            /////////////////////
@@ -1017,6 +1059,7 @@ class Juego {
         this.enemigos.push(jefe);
 
     }
+    
 
     //////////////////////////////          FASES DEL JUEGO        ////////////////////////////////
 
@@ -1188,7 +1231,11 @@ class Juego {
             txtDescripcion.visible = false;
         });
 
-        tarjeta.on('pointerdown', () => {
+        tarjeta.on('pointerdown', (e) => {
+            if (e && typeof e.stopPropagation === 'function') {
+                e.stopPropagation();
+            }
+
             this.contenedorSeleccionInicial.visible = false;
             this.spawnItem(opc.item, 700);
             this.empezarPartidaAccion();
@@ -1245,6 +1292,11 @@ class Juego {
         this.enemigos.forEach(en => en.parent && en.parent.removeChild(en));
         this.balas.forEach(ba => ba.parent && ba.parent.removeChild(ba));
         this.itemsMapa.forEach(it => it.parent && it.parent.removeChild(it));
+
+        if (this.aliados) {
+        this.aliados.forEach(p => p.parent && p.parent.removeChild(p));
+        }
+        this.aliados = [];
         
         this.enemigos = [];
         this.balas = [];
@@ -1330,35 +1382,31 @@ class Juego {
     // chequeo de musica
     const desbloquearMusica = () => {
         if (this.enMenuPrincipal && this.sonidos) {
-            // despierta la musica si estaba suspendida
             if (Howler && Howler.ctx && Howler.ctx.state === 'suspended') {
                 Howler.ctx.resume().then(() => {
                     this.sonidos.detener('musicaMenu'); 
                     this.sonidos.reproducir('musicaMenu');
                 });
             } else {
-                // si ya estaba despierta se activa
                 this.sonidos.detener('musicaMenu'); 
                 this.sonidos.reproducir('musicaMenu');
             }
         }
-
         window.removeEventListener('click', desbloquearMusica);
         window.removeEventListener('keydown', desbloquearMusica);
     };
 
 
-        ////////////////////////             BOTONES            //////////////////////////////
+    ////////////////////////             BOTONES            //////////////////////////////
 
     const btnJugar = this.crearBotonUI(this.texJugar1, this.texJugar2, () => {
-        // para que no interfiera con nada
         window.removeEventListener('click', desbloquearMusica);
         window.removeEventListener('keydown', desbloquearMusica);
 
         if (Howler && Howler.ctx) {
             Howler.ctx.resume().then(() => {
                 this.sonidos.detener('musicaMenu');     
-                this.sonidos.reproducir('musicaPartida'); //arranca la musica de la partida
+                this.sonidos.reproducir('musicaPartida'); 
             }).catch(err => {
                 console.error("Error al reanudar el audio:", err);
             });
@@ -1390,11 +1438,107 @@ class Juego {
     window.removeEventListener('click', desbloquearMusica);
     window.removeEventListener('keydown', desbloquearMusica);
      
-    //resetea los listeners y al interactuar en cualquier lado se inicia la musica
     window.addEventListener('click', desbloquearMusica);
     window.addEventListener('keydown', desbloquearMusica);
 
-    }//------------------- TERMINA CREAR MENU PRINCIPAL --------------///////
+    ////////////////////// pantalla intermediaria //////////////////////////////////
+
+    grupoBotones.visible = false;
+
+    this.pantallaClickParaEmpezar = new PIXI.Container();
+    this.contenedorMenuInicio.addChild(this.pantallaClickParaEmpezar);
+
+    const overlaySprite = new PIXI.Sprite(this.texturaClickParaEmpezar);
+    overlaySprite.width = this.pixiApp.screen.width;
+    overlaySprite.height = this.pixiApp.screen.height;
+    this.pantallaClickParaEmpezar.addChild(overlaySprite);
+
+    this.pantallaClickParaEmpezar.eventMode = 'static';
+    this.pantallaClickParaEmpezar.cursor = 'pointer';
+
+    this.pantallaClickParaEmpezar.on('pointerdown', () => {
+        
+        desbloquearMusica();
+
+        this.pantallaClickParaEmpezar.visible = false;
+
+        const contenedorCarga = new PIXI.Container();
+        
+        const fondoCarga = new PIXI.Graphics()
+            .rect(0, 0, this.pixiApp.screen.width, this.pixiApp.screen.height)
+            .fill({ color: 0x000000 });
+        contenedorCarga.addChild(fondoCarga);
+
+        const sheet = PIXI.Assets.get('imagenes/pj/texture.json'); 
+        let personajeCarga = null;
+
+        if (sheet && sheet.textures) {
+            
+            const framesAtaque = Object.keys(sheet.textures)
+                .filter(key => key.startsWith('DISPARO2/DISPARO'))
+                .sort()
+                .map(key => sheet.textures[key]);
+
+            if (framesAtaque.length > 0) {
+                personajeCarga = new PIXI.AnimatedSprite(framesAtaque);
+                personajeCarga.anchor.set(0.5);
+                personajeCarga.scale.set(2.0); // Duplicamos tamaño para que se luzca
+                personajeCarga.animationSpeed = 0.1; // Velocidad de la animación
+                personajeCarga.x = this.pixiApp.screen.width - 100;
+                personajeCarga.y = this.pixiApp.screen.height - 130; 
+                personajeCarga.play();
+                contenedorCarga.addChild(personajeCarga);
+            }
+        }
+
+        const txtCargando = new PIXI.Text({
+            text: "CARGANDO", 
+            style: { 
+                fontFamily: 'alagard', 
+                fontSize: 30, 
+                fill: 0xffffff, 
+                fontWeight: 'bold' 
+            }
+        });
+        txtCargando.anchor.set(1, 1);
+        txtCargando.x = this.pixiApp.screen.width - 40;  
+        txtCargando.y = this.pixiApp.screen.height - 40; 
+        contenedorCarga.addChild(txtCargando);
+
+        this.pixiApp.stage.addChild(contenedorCarga);
+
+        let tiempoAcumulado = 0;
+        const animarPuntitos = (ticker) => {
+            tiempoAcumulado += ticker.deltaTime;
+
+            if (tiempoAcumulado > 20) {
+                tiempoAcumulado = 0;
+
+                if (txtCargando.text === "CARGANDO...") {
+                    txtCargando.text = "CARGANDO";
+                } else {
+                    txtCargando.text += ".";
+                }
+            }
+        };
+
+        this.pixiApp.ticker.add(animarPuntitos);
+
+        setTimeout(() => {
+            this.pixiApp.ticker.remove(animarPuntitos);
+
+            if (personajeCarga) {
+                personajeCarga.stop();
+            }
+            
+            contenedorCarga.destroy({ children: true });
+
+            grupoBotones.visible = true;
+            
+        }, 2500); 
+    });
+
+} //----- TERMINA CREAR MENU PRINCIPAL ------///////
 
 
 
@@ -1581,15 +1725,157 @@ class Juego {
 
             //droppea item
             if (this.nivelActual % 5 === 0) {
-                console.log(`¡Nivel ${this.nivelActual} alcanzado! Recompensa dropeada en el mapa.`);
-                this.dropearItemAleatorio();
+                console.log(`¡Nivel ${this.nivelActual} alcanzado! Cofre apareciendo.`);
+                
+                // Calculamos una posición cercana al jugador (o en una zona segura)
+                const xCofre = this.jugador.x + (Math.random() * 100 - 50);
+                const yCofre = this.jugador.y + (Math.random() * 100 - 50);
+                
+                this.spawnCofre(xCofre, yCofre);
             }
         }
 
         this.actualizarBarraXP();
     }
 
+    /////////////////////////////////////////// COFRE //////////////////////////////////////////
+    spawnCofre(x, y) {
+    const radio = 650; // Distancia desde el jugador
+    let intentos = 0;
+    let posicionValida = false;
+    let nuevaX, nuevaY;
 
+    // Intentamos buscar una posición que no esté ocupada por otro cofre
+    while (!posicionValida && intentos < 20) {
+        const angulo = Math.random() * Math.PI * 2;
+        nuevaX = x + Math.cos(angulo) * radio;
+        nuevaY = y + Math.sin(angulo) * radio;
+
+        // Verificamos distancia contra todos los cofres ya existentes
+        posicionValida = this.cofres.every(c => {
+            const dx = c.x - nuevaX;
+            const dy = c.y - nuevaY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            return dist > 150; // Los cofres deben estar separados por al menos 150px
+        });
+        intentos++;
+    }
+
+    const texturasBrillo = Object.keys(this.sheetCofreBrillando.textures)
+        .sort()
+        .map(key => this.sheetCofreBrillando.textures[key]);
+
+    const cofre = new PIXI.AnimatedSprite(texturasBrillo);
+    cofre.scale.set(0.15);
+    cofre.x = nuevaX;
+    cofre.y = nuevaY;
+    cofre.anchor.set(0.5);
+    cofre.animationSpeed = 0.15;
+    cofre.play();
+    cofre.activado = false; 
+
+    this.mundo.addChild(cofre);
+    this.cofres.push(cofre);
+}
+
+obtenerItemsAleatorios(cantidad) {
+    let poolCopia = [...this.poolItems];
+    for (let i = poolCopia.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [poolCopia[i], poolCopia[j]] = [poolCopia[j], poolCopia[i]];
+    }
+    return poolCopia.slice(0, cantidad);
+}
+abrirInterfazCofre() {
+    this.contenedorCofre.visible = true;
+
+    // 1. Limpiamos TODO el contenedor para asegurar un lienzo fresco
+    this.contenedorCofre.removeChildren();
+
+    // 2. Añadimos el fondo decorativo (el Sprite que cargaste)
+    const fondoGeneral = new PIXI.Sprite(this.fondoCofre);
+    fondoGeneral.width = 400; // Ajusta según el tamaño de tu imagen
+    fondoGeneral.height = 350;
+    this.contenedorCofre.addChild(fondoGeneral);
+
+    // 3. Obtenemos los ítems
+    const items = this.obtenerItemsAleatorios(3);
+    
+    // 4. Dibujamos cada ítem encima del fondo
+    items.forEach((item, i) => {
+    const btnContainer = new PIXI.Container();
+    btnContainer.x = 20; 
+    btnContainer.y = 50 + (i * 90); 
+    btnContainer.eventMode = 'static';
+    btnContainer.cursor = 'pointer';
+
+    // --- MARCO DORADO ---
+    const marco = new PIXI.Graphics();
+    marco.rect(0, 0, 360, 80);
+    // Un relleno semi-transparente ayuda a que el texto se lea mejor sobre el fondo rojo
+    marco.fill({ color: 0x000000, alpha: 0.3 }); 
+    // Borde dorado de 2px de grosor
+    marco.stroke({ width: 2, color: 0xFFD700 }); 
+    btnContainer.addChild(marco);
+        // Icono
+        if (item.textura) {
+            const icono = new PIXI.Sprite(item.textura);
+            icono.width = 60;
+            icono.height = 60;
+            icono.x = 10;
+            icono.y = 10;
+            btnContainer.addChild(icono);
+        }
+
+        // Texto con descripción breve
+        const nombreLimpio = (item.nombre || "Item").toLowerCase().trim();
+
+        // Aseguramos que el diccionario exista antes de consultar
+        const diccionario = this.descripcionesItems || {}; 
+
+        // Accedemos al diccionario seguro
+        const descripcion = diccionario[nombreLimpio] || "Efecto único.";
+
+        const texto = new PIXI.Text({
+            text: `${item.nombre}\n${descripcion}`,
+            style: { 
+                fill: 0xffffff, 
+                fontSize: 16,
+                wordWrap: true,
+                wordWrapWidth: 270 
+            }
+        });
+        
+        texto.x = 80;
+        texto.y = 15;
+        btnContainer.addChild(texto);
+
+        // Acción de clic
+        btnContainer.on('pointerdown', (e) => {
+            e.stopPropagation();
+            if (this.sonidos) {
+                this.sonidos.reproducir('agarraItem'); // Usando el mismo ID que en actualizarItems
+            }
+            this.jugador.agregarItem(item);
+            this.registrarItemEnInventarioVisual(item);
+            this.contenedorCofre.visible = false;
+            this.juegoPausado = false;
+        });
+        
+        this.contenedorCofre.addChild(btnContainer);
+    });
+}
+crearInterfazCofre() {
+    this.contenedorCofre = new PIXI.Container();
+    this.contenedorCofre.visible = false;
+    
+    // Centramos el contenedor una sola vez aquí
+    this.contenedorCofre.x = (this.pixiApp.screen.width - 400) / 2;
+    this.contenedorCofre.y = (this.pixiApp.screen.height - 350) / 2;
+    
+    this.pixiApp.stage.addChild(this.contenedorCofre);
+}
+/////////////////////////////////////// FIN COFRE /////////////////////////////////////////
     iniciarMusicaJuego() {
         if (this.sonidos) {
             this.sonidos.frenar('musicaMenu'); // frena musica del menu

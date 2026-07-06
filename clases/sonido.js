@@ -5,7 +5,7 @@ class GestorSonidos {
         
         // Volumen
         this.volumenMusica = 0.1;
-        this.volumenEfectos = 0.5;
+        this.volumenEfectos = 0.2;
 
         this._cargarSonidos();
     }

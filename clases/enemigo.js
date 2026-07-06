@@ -5,6 +5,7 @@ class Enemigo extends PIXI.Container {
         this.y = y;
         this.spritesheet = spritesheet;
         this.tipo = tipo;
+        this.estado = 'apareciendo';
 
         // Stats de enemigos
         const statsBase = {
@@ -80,6 +81,7 @@ class Enemigo extends PIXI.Container {
                 this.apareciendo = false;
                 this.sprite.loop = true;
                 this.cambiarAnimacion(this.texturasIdle);
+                this.estado = 'idle';
             };
         } else {
             // efecto fade in por si no tienen animacion de aparicion (esqueleto no tiene y creo que el caballo y el lobo tampoco)
@@ -106,6 +108,7 @@ class Enemigo extends PIXI.Container {
                     this.sprite.alpha = 1;
                     this.sprite.scale.set(this.escalaBase);
                     this.apareciendo = false; // Aca ya permite el movimiento del enemigo
+                    this.estado = 'idle';
                     this.cambiarAnimacion(this.texturasChase); // Aca fijate q fuerza la animación de chase o sea ya pueden empezar a buscarte/correr
                     clearInterval(inte);
                 }
@@ -117,52 +120,90 @@ class Enemigo extends PIXI.Container {
 
     /////////Logico del movimiento para los enemigos///////////////////////////
     actualizar(jugadorX, jugadorY, delta, otrosEnemigos) {
-        if (this.muerto || this.apareciendo) return;
+    if (this.muerto) return;
 
-        // Detectan al jugador con sus x e y
-        let dx = jugadorX - this.x;
-        let dy = jugadorY - this.y;
-        let distancia = Math.sqrt(dx * dx + dy * dy);
-
-        let dirX = dx / (distancia || 1);
-        let dirY = dy / (distancia || 1);
-        
-        // Aca hacemos que se separen un poco asi no se amontonan
-        let separacionX = 0, separacionY = 0;
-        let radioSeparacion = 55;
-        // crea una fuerza de separación entre ellos
-        otrosEnemigos.forEach(otro => {
-            if (otro === this || otro.muerto || otro.apareciendo) return;
-            let dist = Math.sqrt((this.x - otro.x)**2 + (this.y - otro.y)**2);
-            if (dist < radioSeparacion) {
-                let fuerza = (radioSeparacion - dist) / radioSeparacion;
-                separacionX += (this.x - otro.x) * fuerza;
-                separacionY += (this.y - otro.y) * fuerza;
-            }
-        });
-        // Aca el enemigo comprueba si está lo suficientemente cerca del enemigo asi cambia de animación y frena
-        if (distancia > 5) {
-            let movX = (dirX * 0.7) + (separacionX * 2.5) + (Math.random() - 0.5) * 0.05;
-            let movY = (dirY * 0.7) + (separacionY * 2.5) + (Math.random() - 0.5) * 0.05;
-            let mag = Math.sqrt(movX * movX + movY * movY);
-            
-            this.x += (movX / (mag || 1)) * this.velocidad * delta;
-            this.y += (movY / (mag || 1)) * this.velocidad * delta;
-
-            this.cambiarAnimacion(this.texturasChase);
-            // mira hacia donde esta el jugador, estan volteados los sprites asi que se voltean
-            if (dx !== 0) {
-                const mirandoDerecha = dx > 0;
-                if (this.invertirX) {
-                    this.sprite.scale.x = mirandoDerecha ? -this.escalaBase : this.escalaBase;
-                } else {
-                    this.sprite.scale.x = mirandoDerecha ? this.escalaBase : -this.escalaBase;
-                }
-            }
-        } else {
-            this.cambiarAnimacion(this.texturasIdle);
-        }
+    switch (this.estado) {
+        case 'apareciendo':
+            // Tu lógica de spawn (fade in o animacion) ya maneja esto, 
+            // solo asegúrate de que cuando termine, cambies a 'idle' o 'chase'
+            break;
+        case 'idle':
+            this.logicaIdle(jugadorX, jugadorY, delta);
+            break;
+        case 'chase':
+            this.logicaChase(jugadorX, jugadorY, delta, otrosEnemigos);
+            break;
+        case 'atacar':
+            this.logicaAtacar(jugadorX, jugadorY, delta);
+            break;
     }
+}
+logicaIdle(jugadorX, jugadorY, delta) {
+    this.cambiarAnimacion(this.texturasIdle);
+    // ¿El jugador se acercó? Cambiar a chase
+    const dist = this.distanciaAlJugador(jugadorX, jugadorY);
+    if (dist < 500) this.estado = 'chase';
+}
+
+logicaChase(jugadorX, jugadorY, delta, otrosEnemigos) {
+    this.cambiarAnimacion(this.texturasChase);
+    
+    // Moverse hacia el jugador (aquí pones tu lógica actual de movimiento)
+    this.moverseHaciaJugador(jugadorX, jugadorY, delta, otrosEnemigos);
+
+    // ¿Muy cerca? Atacar
+    if (this.distanciaAlJugador(jugadorX, jugadorY) < 30) {
+        this.estado = 'atacar';
+    }
+}
+
+logicaAtacar(jugadorX, jugadorY, delta) {
+    // Lógica de ataque (por ejemplo, esperar un cooldown)
+    // Cuando el jugador se aleje, volver a perseguir
+    if (this.distanciaAlJugador(jugadorX, jugadorY) > 50) {
+        this.estado = 'chase';
+    }
+}
+moverseHaciaJugador(jugadorX, jugadorY, delta, otrosEnemigos) {
+    let dx = jugadorX - this.x;
+    let dy = jugadorY - this.y;
+    let distancia = Math.sqrt(dx * dx + dy * dy);
+
+    let dirX = dx / (distancia || 1);
+    let dirY = dy / (distancia || 1);
+    
+    // Lógica de separación (para que no se amontonen)
+    let separacionX = 0, separacionY = 0;
+    let radioSeparacion = 55;
+    otrosEnemigos.forEach(otro => {
+        if (otro === this || otro.muerto || otro.apareciendo) return;
+        let dist = Math.sqrt((this.x - otro.x)**2 + (this.y - otro.y)**2);
+        if (dist < radioSeparacion) {
+            let fuerza = (radioSeparacion - dist) / radioSeparacion;
+            separacionX += (this.x - otro.x) * fuerza;
+            separacionY += (this.y - otro.y) * fuerza;
+        }
+    });
+
+    // Aplicar movimiento
+    let movX = (dirX * 0.7) + (separacionX * 2.5) + (Math.random() - 0.5) * 0.05;
+    let movY = (dirY * 0.7) + (separacionY * 2.5) + (Math.random() - 0.5) * 0.05;
+    let mag = Math.sqrt(movX * movX + movY * movY);
+    
+    this.x += (movX / (mag || 1)) * this.velocidad * delta;
+    this.y += (movY / (mag || 1)) * this.velocidad * delta;
+
+    // Voltear sprite
+    if (dx !== 0) {
+        const mirandoDerecha = dx > 0;
+        this.sprite.scale.x = (this.invertirX ? (mirandoDerecha ? -1 : 1) : (mirandoDerecha ? 1 : -1)) * this.escalaBase;
+    }
+}
+
+// Método auxiliar para no repetir el Math.sqrt
+distanciaAlJugador(jx, jy) {
+    return Math.sqrt((jx - this.x)**2 + (jy - this.y)**2);
+}
 
     cambiarAnimacion(nuevasTexturas) {
     if (!nuevasTexturas || nuevasTexturas.length === 0 || this.sprite.textures === nuevasTexturas) {
