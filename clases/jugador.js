@@ -174,19 +174,19 @@ class Jugador extends PIXI.Container {
     }
 
     atacar() {
-    if (this.estaAtacando || this.estaRecibiendoDanio) return; // aca le puse para que compruebe si puede disparar, por la cadencia
+        if (this.estaAtacando || this.estaRecibiendoDanio) return; // aca le puse para que compruebe si puede disparar, por la cadencia
 
-    if (!this.texturasAtaque || this.texturasAtaque.length === 0 || !this.texturasAtaque[0]) {
-        console.error("textura de ataque no se cargo");
-        return;
+        if (!this.texturasAtaque || this.texturasAtaque.length === 0 || !this.texturasAtaque[0]) {
+            console.error("textura de ataque no se cargo");
+            return;
+        }
+
+        this.estaAtacando = true;
+        this.anim.loop = false;
+        this.anim.textures = this.texturasAtaque;
+        this.anim.animationSpeed = 0.25; 
+        this.anim.gotoAndPlay(0);
     }
-
-    this.estaAtacando = true;
-    this.anim.loop = false;
-    this.anim.textures = this.texturasAtaque;
-    this.anim.animationSpeed = 0.25; 
-    this.anim.gotoAndPlay(0);
-}
 
     reproducirDanio() {
         this.estaAtacando = false; // Corta el ataque si le pegan
@@ -233,49 +233,50 @@ class Jugador extends PIXI.Container {
     }
 
     disparar() {
-        //si no puede disparar te da false
-    if (!this.puedeDisparar) return false;
-    
-    this.puedeDisparar = false;
-    this.tiempoUltimoDisparo = Date.now();
-    this.enCooldown = true;
+            //si no puede disparar te da false
+        if (!this.puedeDisparar) return false;
+        
+        this.puedeDisparar = false;
+        this.tiempoUltimoDisparo = Date.now();
+        this.enCooldown = true;
 
-    // Activa la animación visual de ataque
-    this.atacar();
+        // Activa la animación visual de ataque
+        this.atacar();
 
-    const mirandoDerecha = this.anim.scale.x > 0;
-    const anguloBase = mirandoDerecha ? 0 : Math.PI;
-    const cantidad = this.stats.cantidadBalas;
-    const separacion = this.stats.dispersion;
+        const mirandoDerecha = this.anim.scale.x > 0;
+        const anguloBase = mirandoDerecha ? 0 : Math.PI;
+        const cantidad = this.stats.cantidadBalas;
+        const separacion = this.stats.dispersion;
 
-    for (let i = 0; i < cantidad; i++) {
-        const offset = (i - (cantidad - 1) / 2) * separacion;
-        const angulo = anguloBase + offset;
+        for (let i = 0; i < cantidad; i++) {
+            const offset = (i - (cantidad - 1) / 2) * separacion;
+            const angulo = anguloBase + offset;
 
-        const dirX = Math.cos(angulo);
-        const dirY = Math.sin(angulo);
+            const dirX = Math.cos(angulo);
+            const dirY = Math.sin(angulo);
 
-        const bala = new Bala(
-            this.x + (mirandoDerecha ? 30 : -30),
-            this.y,
-            dirX,
-            dirY,
-            angulo,
-            this.stats.danio,
-            this.juego.texturasBalas
-        );
+            const bala = new Bala(
+                this.x + (mirandoDerecha ? 30 : -30),
+                this.y,
+                dirX,
+                dirY,
+                angulo,
+                this.stats.danio,
+                this.juego.texturasBalas
+            );
 
-        this.juego.mundo.addChild(bala);
-        this.juego.balas.push(bala);
+            this.juego.mundo.addChild(bala);
+            this.juego.balas.push(bala);
+        }
+
+        // Comprueba si ya puede disparar, o sea si se acabo el cooldown
+        setTimeout(() => {
+            this.puedeDisparar = true;
+            this.enCooldown = false; 
+        }, this.stats.cooldown);
+        return true;
     }
 
-    // Comprueba si ya puede disparar, o sea si se acabo el cooldown
-    setTimeout(() => {
-        this.puedeDisparar = true;
-        this.enCooldown = false; 
-    }, this.stats.cooldown);
-    return true;
-}
     // Cuando agarra un item se fija si lo tenia y si duplica sus stats
     agregarItem(item) {
         const existente = this.inventario.find(i => i.nombre === item.nombre);
@@ -286,6 +287,7 @@ class Jugador extends PIXI.Container {
             this.inventario.push(item);
         }
     }
+
     resetear() {
         this.puedeDisparar = true;
         this.invulnerable = false;
@@ -336,7 +338,10 @@ class Jugador extends PIXI.Container {
         const escala = this.stats.radioAjo / 60;
         this.auraAjo.scale.set(escala);
     }
+
+
     update(delta) {
         this.actualizarBarraCooldown();
     }
+    
 }

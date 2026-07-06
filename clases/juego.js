@@ -489,36 +489,38 @@ class Juego {
                     }
                 }
             }
-                    this.cofres.forEach(cofre => {
-            if (cofre.activado) return;
+                    
+            this.cofres.forEach(cofre => {
+                if (cofre.activado) return;
 
-            const dx = this.jugador.x - cofre.x;
-            const dy = this.jugador.y - cofre.y;
-            const distancia = Math.sqrt(dx * dx + dy * dy);
+                    const dx = this.jugador.x - cofre.x;
+                    const dy = this.jugador.y - cofre.y;
+                    const distancia = Math.sqrt(dx * dx + dy * dy);
 
-            if (distancia < 40) {
-    cofre.activado = true;
-    this.juegoPausado = true;
+                if (distancia < 40) {
+                    cofre.activado = true;
+                    this.juegoPausado = true;
 
-    const texturasAbrir = Object.keys(this.sheetCofreAbriendo.textures)
-        .sort()
-        .map(key => this.sheetCofreAbriendo.textures[key]);
-        
-    cofre.textures = texturasAbrir;
-    cofre.loop = false;
-    cofre.animationSpeed = 0.2;
-    cofre.play();
+                    const texturasAbrir = Object.keys(this.sheetCofreAbriendo.textures)
+                        .sort()
+                        .map(key => this.sheetCofreAbriendo.textures[key]);
+                        
+                    cofre.textures = texturasAbrir;
+                    cofre.loop = false;
+                    cofre.animationSpeed = 0.2;
+                    cofre.play();
 
-    cofre.onComplete = () => {
-        this.abrirInterfazCofre(); // <-- LLAMA AL MÉTODO CORREGIDO
-        cofre.destroy(); // Elimina el sprite visual
-        this.cofres = this.cofres.filter(c => c !== cofre);
-    };
-}
-        });
+                    cofre.onComplete = () => {
+                        this.abrirInterfazCofre(); // <-- LLAMA AL MÉTODO CORREGIDO
+                        cofre.destroy(); // Elimina el sprite visual
+                        this.cofres = this.cofres.filter(c => c !== cofre);
+                    };
+                }
+            });
+
 
             ////////////////       ACTUALIZA TICKER - ENTIDADES - FLECHA - ITEMS       //////////////////
-            // Coordina el jugador tick a tick /tambien el cooldown en jugador
+            // coordina el jugador + cooldown
             if (typeof this.jugador.update === 'function') {
                 this.jugador.update(delta);
             }
@@ -534,10 +536,9 @@ class Juego {
                 });
             }
 
-            // >>> AGREGA EL BUCLE DE ANIMACIÓN DEL DAÑO ACÁ:
             for (let i = this.numerosDanio.length - 1; i >= 0; i--) {
                 const num = this.numerosDanio[i];
-                num.sprite.y -= 0.8 * delta; // Multiplicado por delta para ir suave
+                num.sprite.y -= 0.8 * delta; // multiplicado por delta para ir suave
                 num.vida--;
 
                 if (num.vida < 20) {
@@ -551,12 +552,12 @@ class Juego {
                 }
             }
 
-        }); ///------------CIERRA EL TICKER-----------//
+        }); ////////////////------------CIERRA EL TICKER-----------//////////////////
 
-    }  /////////------------------------CIERRA INIT-------------------------////////////
+    }  /////////------------------------CIERRA INIT-------------------------///////////////////////////////////////////
 
     registrarItemEnInventarioVisual(itemData) {
-        // Busca el primer slot que no este ocupado
+        // busca el primer slot que no este ocupado
         const slotLibre = this.slotsInventario.find(slot => !slot.ocupado);
 
         if (!slotLibre) {
@@ -683,7 +684,7 @@ class Juego {
                     const danioBala = this.jugador.stats.danio;
                     en.recibirDanio(danioBala);
                     
-                    // >>> IMPACTO DE BALA REGISTRADO VISUALMENTE:
+                    //se muestra en pantalla el danio que causan las balas
                     this.mostrarNumeroDanio(en.x, en.y, danioBala);
                     
                     if (en.vidaActual <= 0) {
@@ -745,15 +746,19 @@ class Juego {
                 this.faseActual = 1; 
             }
         });
-    }
+
+    } /////////////----------------TERMINA ACTUALIZACION DE ENTIDADES----------------//////////////////
+   
+   
+   
     mostrarNumeroDanio(x, y, cantidad) {
         const danioTexto = Math.round(cantidad).toString();
         const txt = new PIXI.Text({
             text: danioTexto,
             style: {
-                fontFamily: 'arieal', // Usa tu fuente pixel art
+                fontFamily: 'arieal', // fuente pixel art
                 fontSize: 20,
-                fill: 0xFFFFFF, // Color amarillo/dorado para el daño
+                fill: 0xFFFFFF, // Color amarillo/dorado para el danio
                 stroke: { color: 0x000000, width: 3 },
                 fontWeight: 'bold'
             }
@@ -773,65 +778,63 @@ class Juego {
         });
     }
 
-    /////////--------------------------TERMINA ACTUALIZAR ENTIDADES-----------------------------////////////
-
     ////////////////////        ACTUALIZAR FLECHA            /////////////////////
 
     actualizarFlecha() {
-    if (this.enMenuPrincipal || this.juegoPausado) {
-        this.flechaItem.visible = false;
-        return;
-    }
-
-    // 1. Unimos ambos arreglos para buscar el objetivo más cercano
-    const objetivos = [...(this.itemsMapa || []), ...(this.cofres || [])];
-
-    if (objetivos.length === 0) {
-        this.flechaItem.visible = false;
-        return;
-    }
-
-    let objetivoMasCercano = null;
-    let distanciaMinima = Infinity;
-
-    objetivos.forEach(obj => {
-        // Verificamos que sea un objeto válido (que esté en el mundo)
-        if (obj && (obj.parent || obj.visible)) {
-            const dx = obj.x - this.jugador.x;
-            const dy = obj.y - this.jugador.y;
-            const distancia = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distancia < distanciaMinima) {
-                distanciaMinima = distancia;
-                objetivoMasCercano = obj;
-            }
+        if (this.enMenuPrincipal || this.juegoPausado) {
+            this.flechaItem.visible = false;
+            return;
         }
-    });
 
-    // 2. Si no hay nada, ocultar
-    if (!objetivoMasCercano) {
-        this.flechaItem.visible = false;
-        return;
+        // se busca el objeto mas cercano
+        const objetivos = [...(this.itemsMapa || []), ...(this.cofres || [])];
+
+        if (objetivos.length === 0) {
+            this.flechaItem.visible = false;
+            return;
+        }
+
+        let objetivoMasCercano = null;
+        let distanciaMinima = Infinity;
+
+        objetivos.forEach(obj => {
+            // chequea que sea un objeto valido
+            if (obj && (obj.parent || obj.visible)) {
+                const dx = obj.x - this.jugador.x;
+                const dy = obj.y - this.jugador.y;
+                const distancia = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distancia < distanciaMinima) {
+                    distanciaMinima = distancia;
+                    objetivoMasCercano = obj;
+                }
+            }
+        });
+
+        // si no hay objeto, no aparece
+        if (!objetivoMasCercano) {
+            this.flechaItem.visible = false;
+            return;
+        }
+
+        this.flechaItem.visible = true;
+
+        // angulo hacia el objeto
+        const dx = objetivoMasCercano.x - this.jugador.x;
+        const dy = objetivoMasCercano.y - this.jugador.y;
+        const angulo = Math.atan2(dy, dx);
+
+        // orbita
+        const centroX = this.pixiApp.screen.width / 2;
+        const centroY = this.pixiApp.screen.height / 2;
+        const radioOrbita = 100; 
+
+        this.flechaItem.x = centroX + Math.cos(angulo) * radioOrbita;
+        this.flechaItem.y = centroY + Math.sin(angulo) * radioOrbita;
+
+        this.flechaItem.anchor.set(0.5, 0.5);
+        this.flechaItem.rotation = angulo - Math.PI / 15;
     }
-
-    this.flechaItem.visible = true;
-
-    // 3. Ángulo hacia el objetivo (usando las coordenadas del objetivo encontrado)
-    const dx = objetivoMasCercano.x - this.jugador.x;
-    const dy = objetivoMasCercano.y - this.jugador.y;
-    const angulo = Math.atan2(dy, dx);
-
-    // Mantenemos tu lógica de órbita
-    const centroX = this.pixiApp.screen.width / 2;
-    const centroY = this.pixiApp.screen.height / 2;
-    const radioOrbita = 100; 
-
-    this.flechaItem.x = centroX + Math.cos(angulo) * radioOrbita;
-    this.flechaItem.y = centroY + Math.sin(angulo) * radioOrbita;
-
-    this.flechaItem.anchor.set(0.5, 0.5);
-    this.flechaItem.rotation = angulo - Math.PI / 15;
-}
 
 
     ////////////////////        ACTUALIZAR ITEMS            /////////////////////
@@ -1102,151 +1105,151 @@ class Juego {
 
 
     crearMenuSeleccionInicial() {
-    this.contenedorSeleccionInicial = new PIXI.Container();
-    this.contenedorSeleccionInicial.visible = false;
+        this.contenedorSeleccionInicial = new PIXI.Container();
+        this.contenedorSeleccionInicial.visible = false;
 
-    const fondoOpc = new PIXI.Graphics()
-        .rect(0, 0, this.pixiApp.screen.width, this.pixiApp.screen.height)
-        .fill({ color: 0x000000, alpha: 0.85 });
-    this.contenedorSeleccionInicial.addChild(fondoOpc);
+        const fondoOpc = new PIXI.Graphics()
+            .rect(0, 0, this.pixiApp.screen.width, this.pixiApp.screen.height)
+            .fill({ color: 0x000000, alpha: 0.85 });
+        this.contenedorSeleccionInicial.addChild(fondoOpc);
 
-    const textoTitulo = new PIXI.Text({
-        text: "ELIJE EL ITEM QUE APARECERA EN EL MAPA", 
-        style: { fontFamily: 'alagard', fontSize: 30, fill: 0xffffff, fontWeight: 'bold' }
-    });
-    textoTitulo.anchor.set(0.5);
-    textoTitulo.x = this.pixiApp.screen.width / 2;
-    textoTitulo.y = this.pixiApp.screen.height * 0.15;
-    this.contenedorSeleccionInicial.addChild(textoTitulo);
+        const textoTitulo = new PIXI.Text({
+            text: "ELIJE EL ITEM QUE APARECERA EN EL MAPA", 
+            style: { fontFamily: 'alagard', fontSize: 30, fill: 0xffffff, fontWeight: 'bold' }
+        });
+        textoTitulo.anchor.set(0.5);
+        textoTitulo.x = this.pixiApp.screen.width / 2;
+        textoTitulo.y = this.pixiApp.screen.height * 0.15;
+        this.contenedorSeleccionInicial.addChild(textoTitulo);
 
-    const descripcionesItems = {
-        'benevolencia': "Aumenta tu vida máxima y restaura por completo toda tu barra de salud.",
-        'piedad': "Restaura 20 puntos de salud de forma inmediata (no puede superar la vida máxima).",
-        'vigor': "Aumenta la fuerza y las estadísticas físicas base del personaje.",
-        'compañero alado': "Invoca una paloma compañera que vuela alrededor atacando automáticamente a los monstruos.",
-        'emanar': "Emana un aura mística que inflige daño continuo a los enemigos cercanos.",
-        'frenesí': "Reduce el tiempo de recarga entre ataques, permitiéndote disparar mucho más rápido.",
-        'foco': "Achica el cono de dispersión de tus disparos para lograr una precisión perfecta.",
-        'botas': "Aumenta la velocidad de movimiento del jugador de forma permanente.",
-        'prisa': "Aumenta la velocidad de movimiento del jugador de forma permanente.",
-        'violencia': "Incrementa la cantidad de proyectiles disparados simultáneamente."
-    };
-
-    const todosLosItems = this.poolItems.map(objItem => {
-        let nombreLimpio = objItem.nombre || "Item";
-        let textoMostrar = nombreLimpio;
-        
-        if (nombreLimpio.toLowerCase() === 'benevolencia') textoMostrar = "Benevolencia\n(Vida Max)";
-        else if (nombreLimpio.toLowerCase() === 'piedad') textoMostrar = "Piedad\n(Curación)";
-        else if (nombreLimpio.toLowerCase() === 'emanar') textoMostrar = "Emanar\n(Ajo)";
-        else if (nombreLimpio.toLowerCase() === 'vigor') textoMostrar = "Vigor\n(Fuerza)";
-        else if (nombreLimpio.toLowerCase() === 'compañero alado') textoMostrar = "Compañero\nAlado";
-        else if (['frenesí', 'frenesi'].includes(nombreLimpio.toLowerCase())) textoMostrar = "Frenesí\n(Cadencia)";
-        else if (nombreLimpio.toLowerCase() === 'foco') textoMostrar = "Foco\n(Precisión)";
-        else if (['botas', 'prisa'].includes(nombreLimpio.toLowerCase())) textoMostrar = "Botas\n(Prisa)";
-        else if (['balas', 'violencia'].includes(nombreLimpio.toLowerCase())) textoMostrar = "Violencia\n(Balas)";
-
-        let desc = objItem.descripcion || descripcionesItems[nombreLimpio.toLowerCase()] || "Un ítem especial con efectos únicos para tu personaje.";
-
-        return {
-            item: objItem,
-            texto: textoMostrar,
-            descripcion: desc
+        const descripcionesItems = {
+            'benevolencia': "Aumenta tu vida máxima y restaura por completo toda tu barra de salud.",
+            'piedad': "Restaura 20 puntos de salud de forma inmediata (no puede superar la vida máxima).",
+            'vigor': "Aumenta la fuerza y las estadísticas físicas base del personaje.",
+            'compañero alado': "Invoca una paloma compañera que vuela alrededor atacando automáticamente a los monstruos.",
+            'emanar': "Emana un aura mística que inflige daño continuo a los enemigos cercanos.",
+            'frenesí': "Reduce el tiempo de recarga entre ataques, permitiéndote disparar mucho más rápido.",
+            'foco': "Achica el cono de dispersión de tus disparos para lograr una precisión perfecta.",
+            'botas': "Aumenta la velocidad de movimiento del jugador de forma permanente.",
+            'prisa': "Aumenta la velocidad de movimiento del jugador de forma permanente.",
+            'violencia': "Incrementa la cantidad de proyectiles disparados simultáneamente."
         };
-    });
 
-    for (let i = todosLosItems.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [todosLosItems[i], todosLosItems[j]] = [todosLosItems[j], todosLosItems[i]];
-    }
+        const todosLosItems = this.poolItems.map(objItem => {
+            let nombreLimpio = objItem.nombre || "Item";
+            let textoMostrar = nombreLimpio;
+            
+            if (nombreLimpio.toLowerCase() === 'benevolencia') textoMostrar = "Benevolencia\n(Vida Max)";
+            else if (nombreLimpio.toLowerCase() === 'piedad') textoMostrar = "Piedad\n(Curación)";
+            else if (nombreLimpio.toLowerCase() === 'emanar') textoMostrar = "Emanar\n(Ajo)";
+            else if (nombreLimpio.toLowerCase() === 'vigor') textoMostrar = "Vigor\n(Fuerza)";
+            else if (nombreLimpio.toLowerCase() === 'compañero alado') textoMostrar = "Compañero\nAlado";
+            else if (['frenesí', 'frenesi'].includes(nombreLimpio.toLowerCase())) textoMostrar = "Frenesí\n(Cadencia)";
+            else if (nombreLimpio.toLowerCase() === 'foco') textoMostrar = "Foco\n(Precisión)";
+            else if (['botas', 'prisa'].includes(nombreLimpio.toLowerCase())) textoMostrar = "Botas\n(Prisa)";
+            else if (['balas', 'violencia'].includes(nombreLimpio.toLowerCase())) textoMostrar = "Violencia\n(Balas)";
 
-    const opciones = todosLosItems.slice(0, 3);
+            let desc = objItem.descripcion || descripcionesItems[nombreLimpio.toLowerCase()] || "Un ítem especial con efectos únicos para tu personaje.";
 
-    const txtDescripcion = new PIXI.Text({
-        text: "",
-        style: { 
-            fontFamily: 'alagard', 
-            fontSize: 20, 
-            fill: 0x00CCFF, 
-            align: 'center',
-            wordWrap: true,
-            wordWrapWidth: 550
+            return {
+                item: objItem,
+                texto: textoMostrar,
+                descripcion: desc
+            };
+        });
+
+        for (let i = todosLosItems.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [todosLosItems[i], todosLosItems[j]] = [todosLosItems[j], todosLosItems[i]];
         }
-    });
-    txtDescripcion.anchor.set(0.5);
-    txtDescripcion.x = this.pixiApp.screen.width / 2;
-    txtDescripcion.y = this.pixiApp.screen.height * 0.8;
-    txtDescripcion.visible = false;
-    this.contenedorSeleccionInicial.addChild(txtDescripcion);
 
-    const anchoTarjeta = 180;
-    const espacio = 60;
-    const totalAncho = (anchoTarjeta * opciones.length) + (espacio * (opciones.length - 1));
-    let xInicial = (this.pixiApp.screen.width - totalAncho) / 2 + (anchoTarjeta / 2);
+        const opciones = todosLosItems.slice(0, 3);
 
-    opciones.forEach((opc) => {
-        const tarjeta = new PIXI.Container();
-        tarjeta.x = xInicial;
-        tarjeta.y = this.pixiApp.screen.height * 0.45;
-
-        const fondoTarj = new PIXI.Graphics()
-            .roundRect(-anchoTarjeta / 2, -120, anchoTarjeta, 240, 10)
-            .fill({ color: 0x1a1a1a })
-            .stroke({ color: 0x444444, width: 2 });
-        tarjeta.addChild(fondoTarj);
-
-        const icono = new PIXI.Sprite(opc.item.textura);
-        icono.anchor.set(0.5);
-        icono.scale.set(1.6);
-        icono.y = -30;
-        tarjeta.addChild(icono);
-
-        const txtNombre = new PIXI.Text({
-            text: opc.texto,
-            style: { fontFamily: 'Arial', fontSize: 16, fill: 0xffffff, fontWeight: 'bold', align: 'center' }
-        });
-        txtNombre.anchor.set(0.5);
-        txtNombre.y = 55;
-        tarjeta.addChild(txtNombre);
-
-        tarjeta.eventMode = 'static';
-        tarjeta.cursor = 'pointer';
-
-        // Al pasar el mouse por encima
-        tarjeta.on('pointerover', () => {
-            fondoTarj.clear().roundRect(-anchoTarjeta / 2, -120, anchoTarjeta, 240, 10)
-                .fill({ color: 0x262626 }).stroke({ color: 0x00CCFF, width: 3 });
-            tarjeta.scale.set(1.05);
-
-            txtDescripcion.text = opc.descripcion;
-            txtDescripcion.visible = true;
-        });
-
-        // Al sacar el mouse
-        tarjeta.on('pointerout', () => {
-            fondoTarj.clear().roundRect(-anchoTarjeta / 2, -120, anchoTarjeta, 240, 10)
-                .fill({ color: 0x1a1a1a }).stroke({ color: 0x444444, width: 2 });
-            tarjeta.scale.set(1.0);
-
-            txtDescripcion.visible = false;
-        });
-
-        tarjeta.on('pointerdown', (e) => {
-            if (e && typeof e.stopPropagation === 'function') {
-                e.stopPropagation();
+        const txtDescripcion = new PIXI.Text({
+            text: "",
+            style: { 
+                fontFamily: 'alagard', 
+                fontSize: 20, 
+                fill: 0x00CCFF, 
+                align: 'center',
+                wordWrap: true,
+                wordWrapWidth: 550
             }
+        });
+        txtDescripcion.anchor.set(0.5);
+        txtDescripcion.x = this.pixiApp.screen.width / 2;
+        txtDescripcion.y = this.pixiApp.screen.height * 0.8;
+        txtDescripcion.visible = false;
+        this.contenedorSeleccionInicial.addChild(txtDescripcion);
 
-            this.contenedorSeleccionInicial.visible = false;
-            this.spawnItem(opc.item, 700);
-            this.empezarPartidaAccion();
+        const anchoTarjeta = 180;
+        const espacio = 60;
+        const totalAncho = (anchoTarjeta * opciones.length) + (espacio * (opciones.length - 1));
+        let xInicial = (this.pixiApp.screen.width - totalAncho) / 2 + (anchoTarjeta / 2);
+
+        opciones.forEach((opc) => {
+            const tarjeta = new PIXI.Container();
+            tarjeta.x = xInicial;
+            tarjeta.y = this.pixiApp.screen.height * 0.45;
+
+            const fondoTarj = new PIXI.Graphics()
+                .roundRect(-anchoTarjeta / 2, -120, anchoTarjeta, 240, 10)
+                .fill({ color: 0x1a1a1a })
+                .stroke({ color: 0x444444, width: 2 });
+            tarjeta.addChild(fondoTarj);
+
+            const icono = new PIXI.Sprite(opc.item.textura);
+            icono.anchor.set(0.5);
+            icono.scale.set(1.6);
+            icono.y = -30;
+            tarjeta.addChild(icono);
+
+            const txtNombre = new PIXI.Text({
+                text: opc.texto,
+                style: { fontFamily: 'Arial', fontSize: 16, fill: 0xffffff, fontWeight: 'bold', align: 'center' }
+            });
+            txtNombre.anchor.set(0.5);
+            txtNombre.y = 55;
+            tarjeta.addChild(txtNombre);
+
+            tarjeta.eventMode = 'static';
+            tarjeta.cursor = 'pointer';
+
+            // Al pasar el mouse por encima
+            tarjeta.on('pointerover', () => {
+                fondoTarj.clear().roundRect(-anchoTarjeta / 2, -120, anchoTarjeta, 240, 10)
+                    .fill({ color: 0x262626 }).stroke({ color: 0x00CCFF, width: 3 });
+                tarjeta.scale.set(1.05);
+
+                txtDescripcion.text = opc.descripcion;
+                txtDescripcion.visible = true;
+            });
+
+            // Al sacar el mouse
+            tarjeta.on('pointerout', () => {
+                fondoTarj.clear().roundRect(-anchoTarjeta / 2, -120, anchoTarjeta, 240, 10)
+                    .fill({ color: 0x1a1a1a }).stroke({ color: 0x444444, width: 2 });
+                tarjeta.scale.set(1.0);
+
+                txtDescripcion.visible = false;
+            });
+
+            tarjeta.on('pointerdown', (e) => {
+                if (e && typeof e.stopPropagation === 'function') {
+                    e.stopPropagation();
+                }
+
+                this.contenedorSeleccionInicial.visible = false;
+                this.spawnItem(opc.item, 700);
+                this.empezarPartidaAccion();
+            });
+
+            this.contenedorSeleccionInicial.addChild(tarjeta);
+            xInicial += anchoTarjeta + espacio;
         });
 
-        this.contenedorSeleccionInicial.addChild(tarjeta);
-        xInicial += anchoTarjeta + espacio;
-    });
-
-    this.pixiApp.stage.addChild(this.contenedorSeleccionInicial);
-}
+        this.pixiApp.stage.addChild(this.contenedorSeleccionInicial);
+    }
 
     volverAlMenu() {
         this.enMenuPrincipal = true;
@@ -1371,174 +1374,174 @@ class Juego {
 
 
     crearMenuPrincipal() {
-    this.contenedorMenuInicio = new PIXI.Container();
-    const fondo = new PIXI.Sprite(this.texturaFondoInicio);
-    fondo.width = this.pixiApp.screen.width;
-    fondo.height = this.pixiApp.screen.height;
-    this.contenedorMenuInicio.addChild(fondo);
+        this.contenedorMenuInicio = new PIXI.Container();
+        const fondo = new PIXI.Sprite(this.texturaFondoInicio);
+        fondo.width = this.pixiApp.screen.width;
+        fondo.height = this.pixiApp.screen.height;
+        this.contenedorMenuInicio.addChild(fondo);
 
-    const grupoBotones = new PIXI.Container();
+        const grupoBotones = new PIXI.Container();
 
-    // chequeo de musica
-    const desbloquearMusica = () => {
-        if (this.enMenuPrincipal && this.sonidos) {
-            if (Howler && Howler.ctx && Howler.ctx.state === 'suspended') {
-                Howler.ctx.resume().then(() => {
+        // chequeo de musica
+        const desbloquearMusica = () => {
+            if (this.enMenuPrincipal && this.sonidos) {
+                if (Howler && Howler.ctx && Howler.ctx.state === 'suspended') {
+                    Howler.ctx.resume().then(() => {
+                        this.sonidos.detener('musicaMenu'); 
+                        this.sonidos.reproducir('musicaMenu');
+                    });
+                } else {
                     this.sonidos.detener('musicaMenu'); 
                     this.sonidos.reproducir('musicaMenu');
-                });
-            } else {
-                this.sonidos.detener('musicaMenu'); 
-                this.sonidos.reproducir('musicaMenu');
-            }
-        }
-        window.removeEventListener('click', desbloquearMusica);
-        window.removeEventListener('keydown', desbloquearMusica);
-    };
-
-
-    ////////////////////////             BOTONES            //////////////////////////////
-
-    const btnJugar = this.crearBotonUI(this.texJugar1, this.texJugar2, () => {
-        window.removeEventListener('click', desbloquearMusica);
-        window.removeEventListener('keydown', desbloquearMusica);
-
-        if (Howler && Howler.ctx) {
-            Howler.ctx.resume().then(() => {
-                this.sonidos.detener('musicaMenu');     
-                this.sonidos.reproducir('musicaPartida'); 
-            }).catch(err => {
-                console.error("Error al reanudar el audio:", err);
-            });
-        } else {
-            this.sonidos.detener('musicaMenu');
-            this.sonidos.reproducir('musicaPartida');
-        }
-
-        this.empezarJuego(); 
-    });
-
-    const btnInst = this.crearBotonUI(this.texInst1, this.texInst2, () => {
-        this.contenedorMenuInicio.visible = false;
-        this.contenedorInstrucciones.visible = true;
-    });
-    const btnSalir = this.crearBotonUI(this.texSalir1, this.texSalir2, () => window.close());
-
-    btnJugar.y = 0;
-    btnInst.y = 100;
-    btnSalir.y = 200;
-
-    grupoBotones.addChild(btnJugar, btnInst, btnSalir);
-    grupoBotones.x = this.pixiApp.screen.width / 2;
-    grupoBotones.y = this.pixiApp.screen.height * 0.40; 
-    this.contenedorMenuInicio.addChild(grupoBotones);
-    this.pixiApp.stage.addChild(this.contenedorMenuInicio);
-
-   
-    window.removeEventListener('click', desbloquearMusica);
-    window.removeEventListener('keydown', desbloquearMusica);
-     
-    window.addEventListener('click', desbloquearMusica);
-    window.addEventListener('keydown', desbloquearMusica);
-
-    ////////////////////// pantalla intermediaria //////////////////////////////////
-
-    grupoBotones.visible = false;
-
-    this.pantallaClickParaEmpezar = new PIXI.Container();
-    this.contenedorMenuInicio.addChild(this.pantallaClickParaEmpezar);
-
-    const overlaySprite = new PIXI.Sprite(this.texturaClickParaEmpezar);
-    overlaySprite.width = this.pixiApp.screen.width;
-    overlaySprite.height = this.pixiApp.screen.height;
-    this.pantallaClickParaEmpezar.addChild(overlaySprite);
-
-    this.pantallaClickParaEmpezar.eventMode = 'static';
-    this.pantallaClickParaEmpezar.cursor = 'pointer';
-
-    this.pantallaClickParaEmpezar.on('pointerdown', () => {
-        
-        desbloquearMusica();
-
-        this.pantallaClickParaEmpezar.visible = false;
-
-        const contenedorCarga = new PIXI.Container();
-        
-        const fondoCarga = new PIXI.Graphics()
-            .rect(0, 0, this.pixiApp.screen.width, this.pixiApp.screen.height)
-            .fill({ color: 0x000000 });
-        contenedorCarga.addChild(fondoCarga);
-
-        const sheet = PIXI.Assets.get('imagenes/pj/texture.json'); 
-        let personajeCarga = null;
-
-        if (sheet && sheet.textures) {
-            
-            const framesAtaque = Object.keys(sheet.textures)
-                .filter(key => key.startsWith('DISPARO2/DISPARO'))
-                .sort()
-                .map(key => sheet.textures[key]);
-
-            if (framesAtaque.length > 0) {
-                personajeCarga = new PIXI.AnimatedSprite(framesAtaque);
-                personajeCarga.anchor.set(0.5);
-                personajeCarga.scale.set(2.0); // Duplicamos tamaño para que se luzca
-                personajeCarga.animationSpeed = 0.1; // Velocidad de la animación
-                personajeCarga.x = this.pixiApp.screen.width - 100;
-                personajeCarga.y = this.pixiApp.screen.height - 130; 
-                personajeCarga.play();
-                contenedorCarga.addChild(personajeCarga);
-            }
-        }
-
-        const txtCargando = new PIXI.Text({
-            text: "CARGANDO", 
-            style: { 
-                fontFamily: 'alagard', 
-                fontSize: 30, 
-                fill: 0xffffff, 
-                fontWeight: 'bold' 
-            }
-        });
-        txtCargando.anchor.set(1, 1);
-        txtCargando.x = this.pixiApp.screen.width - 40;  
-        txtCargando.y = this.pixiApp.screen.height - 40; 
-        contenedorCarga.addChild(txtCargando);
-
-        this.pixiApp.stage.addChild(contenedorCarga);
-
-        let tiempoAcumulado = 0;
-        const animarPuntitos = (ticker) => {
-            tiempoAcumulado += ticker.deltaTime;
-
-            if (tiempoAcumulado > 20) {
-                tiempoAcumulado = 0;
-
-                if (txtCargando.text === "CARGANDO...") {
-                    txtCargando.text = "CARGANDO";
-                } else {
-                    txtCargando.text += ".";
                 }
             }
+            window.removeEventListener('click', desbloquearMusica);
+            window.removeEventListener('keydown', desbloquearMusica);
         };
 
-        this.pixiApp.ticker.add(animarPuntitos);
 
-        setTimeout(() => {
-            this.pixiApp.ticker.remove(animarPuntitos);
+        ////////////////////////             BOTONES            //////////////////////////////
 
-            if (personajeCarga) {
-                personajeCarga.stop();
+        const btnJugar = this.crearBotonUI(this.texJugar1, this.texJugar2, () => {
+            window.removeEventListener('click', desbloquearMusica);
+            window.removeEventListener('keydown', desbloquearMusica);
+
+            if (Howler && Howler.ctx) {
+                Howler.ctx.resume().then(() => {
+                    this.sonidos.detener('musicaMenu');     
+                    this.sonidos.reproducir('musicaPartida'); 
+                }).catch(err => {
+                    console.error("Error al reanudar el audio:", err);
+                });
+            } else {
+                this.sonidos.detener('musicaMenu');
+                this.sonidos.reproducir('musicaPartida');
             }
-            
-            contenedorCarga.destroy({ children: true });
 
-            grupoBotones.visible = true;
-            
-        }, 2500); 
-    });
+            this.empezarJuego(); 
+        });
 
-} //----- TERMINA CREAR MENU PRINCIPAL ------///////
+        const btnInst = this.crearBotonUI(this.texInst1, this.texInst2, () => {
+            this.contenedorMenuInicio.visible = false;
+            this.contenedorInstrucciones.visible = true;
+        });
+        const btnSalir = this.crearBotonUI(this.texSalir1, this.texSalir2, () => window.close());
+
+        btnJugar.y = 0;
+        btnInst.y = 100;
+        btnSalir.y = 200;
+
+        grupoBotones.addChild(btnJugar, btnInst, btnSalir);
+        grupoBotones.x = this.pixiApp.screen.width / 2;
+        grupoBotones.y = this.pixiApp.screen.height * 0.40; 
+        this.contenedorMenuInicio.addChild(grupoBotones);
+        this.pixiApp.stage.addChild(this.contenedorMenuInicio);
+
+    
+        window.removeEventListener('click', desbloquearMusica);
+        window.removeEventListener('keydown', desbloquearMusica);
+        
+        window.addEventListener('click', desbloquearMusica);
+        window.addEventListener('keydown', desbloquearMusica);
+
+        ////////////////////// pantalla intermediaria //////////////////////////////////
+
+        grupoBotones.visible = false;
+
+        this.pantallaClickParaEmpezar = new PIXI.Container();
+        this.contenedorMenuInicio.addChild(this.pantallaClickParaEmpezar);
+
+        const overlaySprite = new PIXI.Sprite(this.texturaClickParaEmpezar);
+        overlaySprite.width = this.pixiApp.screen.width;
+        overlaySprite.height = this.pixiApp.screen.height;
+        this.pantallaClickParaEmpezar.addChild(overlaySprite);
+
+        this.pantallaClickParaEmpezar.eventMode = 'static';
+        this.pantallaClickParaEmpezar.cursor = 'pointer';
+
+        this.pantallaClickParaEmpezar.on('pointerdown', () => {
+            
+            desbloquearMusica();
+
+            this.pantallaClickParaEmpezar.visible = false;
+
+            const contenedorCarga = new PIXI.Container();
+            
+            const fondoCarga = new PIXI.Graphics()
+                .rect(0, 0, this.pixiApp.screen.width, this.pixiApp.screen.height)
+                .fill({ color: 0x000000 });
+            contenedorCarga.addChild(fondoCarga);
+
+            const sheet = PIXI.Assets.get('imagenes/pj/texture.json'); 
+            let personajeCarga = null;
+
+            if (sheet && sheet.textures) {
+                
+                const framesAtaque = Object.keys(sheet.textures)
+                    .filter(key => key.startsWith('DISPARO2/DISPARO'))
+                    .sort()
+                    .map(key => sheet.textures[key]);
+
+                if (framesAtaque.length > 0) {
+                    personajeCarga = new PIXI.AnimatedSprite(framesAtaque);
+                    personajeCarga.anchor.set(0.5);
+                    personajeCarga.scale.set(2.0); 
+                    personajeCarga.animationSpeed = 0.1; 
+                    personajeCarga.x = this.pixiApp.screen.width - 100;
+                    personajeCarga.y = this.pixiApp.screen.height - 130; 
+                    personajeCarga.play();
+                    contenedorCarga.addChild(personajeCarga);
+                }
+            }
+
+            const txtCargando = new PIXI.Text({
+                text: "CARGANDO", 
+                style: { 
+                    fontFamily: 'alagard', 
+                    fontSize: 30, 
+                    fill: 0xffffff, 
+                    fontWeight: 'bold' 
+                }
+            });
+            txtCargando.anchor.set(1, 1);
+            txtCargando.x = this.pixiApp.screen.width - 40;  
+            txtCargando.y = this.pixiApp.screen.height - 40; 
+            contenedorCarga.addChild(txtCargando);
+
+            this.pixiApp.stage.addChild(contenedorCarga);
+
+            let tiempoAcumulado = 0;
+            const animarPuntitos = (ticker) => {
+                tiempoAcumulado += ticker.deltaTime;
+
+                if (tiempoAcumulado > 20) {
+                    tiempoAcumulado = 0;
+
+                    if (txtCargando.text === "CARGANDO...") {
+                        txtCargando.text = "CARGANDO";
+                    } else {
+                        txtCargando.text += ".";
+                    }
+                }
+            };
+
+            this.pixiApp.ticker.add(animarPuntitos);
+
+            setTimeout(() => {
+                this.pixiApp.ticker.remove(animarPuntitos);
+
+                if (personajeCarga) {
+                    personajeCarga.stop();
+                }
+                
+                contenedorCarga.destroy({ children: true });
+
+                grupoBotones.visible = true;
+                
+            }, 2500); 
+        });
+
+    } //----- TERMINA CREAR MENU PRINCIPAL ------///////
 
 
 
@@ -1740,142 +1743,141 @@ class Juego {
 
     /////////////////////////////////////////// COFRE //////////////////////////////////////////
     spawnCofre(x, y) {
-    const radio = 650; // Distancia desde el jugador
-    let intentos = 0;
-    let posicionValida = false;
-    let nuevaX, nuevaY;
+        const radio = 650; // distancia desde el jugador
+        let intentos = 0;
+        let posicionValida = false;
+        let nuevaX, nuevaY;
 
-    // Intentamos buscar una posición que no esté ocupada por otro cofre
-    while (!posicionValida && intentos < 20) {
-        const angulo = Math.random() * Math.PI * 2;
-        nuevaX = x + Math.cos(angulo) * radio;
-        nuevaY = y + Math.sin(angulo) * radio;
+        // que la posicion del cofre sea valida
+        while (!posicionValida && intentos < 20) {
+            const angulo = Math.random() * Math.PI * 2;
+            nuevaX = x + Math.cos(angulo) * radio;
+            nuevaY = y + Math.sin(angulo) * radio;
 
-        // Verificamos distancia contra todos los cofres ya existentes
-        posicionValida = this.cofres.every(c => {
-            const dx = c.x - nuevaX;
-            const dy = c.y - nuevaY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            return dist > 150; // Los cofres deben estar separados por al menos 150px
-        });
-        intentos++;
-    }
-
-    const texturasBrillo = Object.keys(this.sheetCofreBrillando.textures)
-        .sort()
-        .map(key => this.sheetCofreBrillando.textures[key]);
-
-    const cofre = new PIXI.AnimatedSprite(texturasBrillo);
-    cofre.scale.set(0.15);
-    cofre.x = nuevaX;
-    cofre.y = nuevaY;
-    cofre.anchor.set(0.5);
-    cofre.animationSpeed = 0.15;
-    cofre.play();
-    cofre.activado = false; 
-
-    this.mundo.addChild(cofre);
-    this.cofres.push(cofre);
-}
-
-obtenerItemsAleatorios(cantidad) {
-    let poolCopia = [...this.poolItems];
-    for (let i = poolCopia.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [poolCopia[i], poolCopia[j]] = [poolCopia[j], poolCopia[i]];
-    }
-    return poolCopia.slice(0, cantidad);
-}
-abrirInterfazCofre() {
-    this.contenedorCofre.visible = true;
-
-    // 1. Limpiamos TODO el contenedor para asegurar un lienzo fresco
-    this.contenedorCofre.removeChildren();
-
-    // 2. Añadimos el fondo decorativo (el Sprite que cargaste)
-    const fondoGeneral = new PIXI.Sprite(this.fondoCofre);
-    fondoGeneral.width = 400; // Ajusta según el tamaño de tu imagen
-    fondoGeneral.height = 350;
-    this.contenedorCofre.addChild(fondoGeneral);
-
-    // 3. Obtenemos los ítems
-    const items = this.obtenerItemsAleatorios(3);
-    
-    // 4. Dibujamos cada ítem encima del fondo
-    items.forEach((item, i) => {
-    const btnContainer = new PIXI.Container();
-    btnContainer.x = 20; 
-    btnContainer.y = 50 + (i * 90); 
-    btnContainer.eventMode = 'static';
-    btnContainer.cursor = 'pointer';
-
-    // --- MARCO DORADO ---
-    const marco = new PIXI.Graphics();
-    marco.rect(0, 0, 360, 80);
-    // Un relleno semi-transparente ayuda a que el texto se lea mejor sobre el fondo rojo
-    marco.fill({ color: 0x000000, alpha: 0.3 }); 
-    // Borde dorado de 2px de grosor
-    marco.stroke({ width: 2, color: 0xFFD700 }); 
-    btnContainer.addChild(marco);
-        // Icono
-        if (item.textura) {
-            const icono = new PIXI.Sprite(item.textura);
-            icono.width = 60;
-            icono.height = 60;
-            icono.x = 10;
-            icono.y = 10;
-            btnContainer.addChild(icono);
+            // distancia entre otros cofres
+            posicionValida = this.cofres.every(c => {
+                const dx = c.x - nuevaX;
+                const dy = c.y - nuevaY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                return dist > 150; // distnacia minima
+            });
+            intentos++;
         }
 
-        // Texto con descripción breve
-        const nombreLimpio = (item.nombre || "Item").toLowerCase().trim();
+        const texturasBrillo = Object.keys(this.sheetCofreBrillando.textures)
+            .sort()
+            .map(key => this.sheetCofreBrillando.textures[key]);
 
-        // Aseguramos que el diccionario exista antes de consultar
-        const diccionario = this.descripcionesItems || {}; 
+        const cofre = new PIXI.AnimatedSprite(texturasBrillo);
+        cofre.scale.set(0.15);
+        cofre.x = nuevaX;
+        cofre.y = nuevaY;
+        cofre.anchor.set(0.5);
+        cofre.animationSpeed = 0.15;
+        cofre.play();
+        cofre.activado = false; 
 
-        // Accedemos al diccionario seguro
-        const descripcion = diccionario[nombreLimpio] || "Efecto único.";
+        this.mundo.addChild(cofre);
+        this.cofres.push(cofre);
+    }
 
-        const texto = new PIXI.Text({
-            text: `${item.nombre}\n${descripcion}`,
-            style: { 
-                fill: 0xffffff, 
-                fontSize: 16,
-                wordWrap: true,
-                wordWrapWidth: 270 
-            }
-        });
+    obtenerItemsAleatorios(cantidad) {
+        let poolCopia = [...this.poolItems];
+        for (let i = poolCopia.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [poolCopia[i], poolCopia[j]] = [poolCopia[j], poolCopia[i]];
+        }
+        return poolCopia.slice(0, cantidad);
+    }
+
+    abrirInterfazCofre() {
+        this.contenedorCofre.visible = true;
+
+        // vacia el contenedor
+        this.contenedorCofre.removeChildren();
+
+        // pone el fondo
+        const fondoGeneral = new PIXI.Sprite(this.fondoCofre);
+        fondoGeneral.width = 400; 
+        fondoGeneral.height = 350;
+        this.contenedorCofre.addChild(fondoGeneral);
+
+        // agarra 3 items aleatorios
+        const items = this.obtenerItemsAleatorios(3);
         
-        texto.x = 80;
-        texto.y = 15;
-        btnContainer.addChild(texto);
+        items.forEach((item, i) => {
+        const btnContainer = new PIXI.Container();
+        btnContainer.x = 20; 
+        btnContainer.y = 50 + (i * 90); 
+        btnContainer.eventMode = 'static';
+        btnContainer.cursor = 'pointer';
 
-        // Acción de clic
-        btnContainer.on('pointerdown', (e) => {
-            e.stopPropagation();
-            if (this.sonidos) {
-                this.sonidos.reproducir('agarraItem'); // Usando el mismo ID que en actualizarItems
+        ///// --- MARCO DORADO --- //////
+
+        const marco = new PIXI.Graphics();
+        marco.rect(0, 0, 360, 80);
+        marco.fill({ color: 0x000000, alpha: 0.3 }); 
+        marco.stroke({ width: 2, color: 0xFFD700 }); 
+        btnContainer.addChild(marco);
+            // icono item
+            if (item.textura) {
+                const icono = new PIXI.Sprite(item.textura);
+                icono.width = 60;
+                icono.height = 60;
+                icono.x = 10;
+                icono.y = 10;
+                btnContainer.addChild(icono);
             }
-            this.jugador.agregarItem(item);
-            this.registrarItemEnInventarioVisual(item);
-            this.contenedorCofre.visible = false;
-            this.juegoPausado = false;
+
+            // descripción del item
+            const nombreLimpio = (item.nombre || "Item").toLowerCase().trim();
+
+            // nos fijamos que exista la descripcion
+            const diccionario = this.descripcionesItems || {}; 
+            const descripcion = diccionario[nombreLimpio] || "Efecto único.";
+
+            const texto = new PIXI.Text({
+                text: `${item.nombre}\n${descripcion}`,
+                style: { 
+                    fill: 0xffffff, 
+                    fontSize: 16,
+                    wordWrap: true,
+                    wordWrapWidth: 270 
+                }
+            });
+            
+            texto.x = 80;
+            texto.y = 15;
+            btnContainer.addChild(texto);
+
+            //efecto del click
+            btnContainer.on('pointerdown', (e) => {
+                e.stopPropagation();
+                if (this.sonidos) {
+                    this.sonidos.reproducir('agarraItem');
+                }
+                this.jugador.agregarItem(item);
+                this.registrarItemEnInventarioVisual(item);
+                this.contenedorCofre.visible = false;
+                this.juegoPausado = false;
+            });
+            
+            this.contenedorCofre.addChild(btnContainer);
         });
+    }
+
+    crearInterfazCofre() {
+        this.contenedorCofre = new PIXI.Container();
+        this.contenedorCofre.visible = false;
         
-        this.contenedorCofre.addChild(btnContainer);
-    });
-}
-crearInterfazCofre() {
-    this.contenedorCofre = new PIXI.Container();
-    this.contenedorCofre.visible = false;
-    
-    // Centramos el contenedor una sola vez aquí
-    this.contenedorCofre.x = (this.pixiApp.screen.width - 400) / 2;
-    this.contenedorCofre.y = (this.pixiApp.screen.height - 350) / 2;
-    
-    this.pixiApp.stage.addChild(this.contenedorCofre);
-}
+        // Centramos el contenedor una sola vez aquí
+        this.contenedorCofre.x = (this.pixiApp.screen.width - 400) / 2;
+        this.contenedorCofre.y = (this.pixiApp.screen.height - 350) / 2;
+        
+        this.pixiApp.stage.addChild(this.contenedorCofre);
+    }
 /////////////////////////////////////// FIN COFRE /////////////////////////////////////////
+
     iniciarMusicaJuego() {
         if (this.sonidos) {
             this.sonidos.frenar('musicaMenu'); // frena musica del menu

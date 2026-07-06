@@ -7,7 +7,7 @@ class Enemigo extends PIXI.Container {
         this.tipo = tipo;
         this.estado = 'apareciendo';
 
-        // Stats de enemigos
+        // stats de enemigos
         const statsBase = {
             'fantasma': { escala: 1.5, animSpeed: 0.2, vida: 3, xp: 10, velocidad: 2, invertirX: true },
             'esqueleto': { escala: 0.5, animSpeed: 0.12, vida: 5, xp: 20, velocidad: 2, invertirX: false },
@@ -114,109 +114,114 @@ class Enemigo extends PIXI.Container {
                 }
             }, 50);
         }
-    }
-    ///////////////////////////////////////////////////
+
+    }/////////----------TERMINA EL CONSTRUCTOR---------//////////////
 
 
-    /////////Logico del movimiento para los enemigos///////////////////////////
+    /////////////////////---------------MOVIMIENTO----ESTADOS--------------///////////////////////////
     actualizar(jugadorX, jugadorY, delta, otrosEnemigos) {
-    if (this.muerto) return;
+        if (this.muerto) return;
 
-    switch (this.estado) {
-        case 'apareciendo':
-            // Tu lógica de spawn (fade in o animacion) ya maneja esto, 
-            // solo asegúrate de que cuando termine, cambies a 'idle' o 'chase'
-            break;
-        case 'idle':
-            this.logicaIdle(jugadorX, jugadorY, delta);
-            break;
-        case 'chase':
-            this.logicaChase(jugadorX, jugadorY, delta, otrosEnemigos);
-            break;
-        case 'atacar':
-            this.logicaAtacar(jugadorX, jugadorY, delta);
-            break;
-    }
-}
-logicaIdle(jugadorX, jugadorY, delta) {
-    this.cambiarAnimacion(this.texturasIdle);
-    // ¿El jugador se acercó? Cambiar a chase
-    const dist = this.distanciaAlJugador(jugadorX, jugadorY);
-    if (dist < 500) this.estado = 'chase';
-}
-
-logicaChase(jugadorX, jugadorY, delta, otrosEnemigos) {
-    this.cambiarAnimacion(this.texturasChase);
-    
-    // Moverse hacia el jugador (aquí pones tu lógica actual de movimiento)
-    this.moverseHaciaJugador(jugadorX, jugadorY, delta, otrosEnemigos);
-
-    // ¿Muy cerca? Atacar
-    if (this.distanciaAlJugador(jugadorX, jugadorY) < 30) {
-        this.estado = 'atacar';
-    }
-}
-
-logicaAtacar(jugadorX, jugadorY, delta) {
-    // Lógica de ataque (por ejemplo, esperar un cooldown)
-    // Cuando el jugador se aleje, volver a perseguir
-    if (this.distanciaAlJugador(jugadorX, jugadorY) > 50) {
-        this.estado = 'chase';
-    }
-}
-moverseHaciaJugador(jugadorX, jugadorY, delta, otrosEnemigos) {
-    let dx = jugadorX - this.x;
-    let dy = jugadorY - this.y;
-    let distancia = Math.sqrt(dx * dx + dy * dy);
-
-    let dirX = dx / (distancia || 1);
-    let dirY = dy / (distancia || 1);
-    
-    // Lógica de separación (para que no se amontonen)
-    let separacionX = 0, separacionY = 0;
-    let radioSeparacion = 55;
-    otrosEnemigos.forEach(otro => {
-        if (otro === this || otro.muerto || otro.apareciendo) return;
-        let dist = Math.sqrt((this.x - otro.x)**2 + (this.y - otro.y)**2);
-        if (dist < radioSeparacion) {
-            let fuerza = (radioSeparacion - dist) / radioSeparacion;
-            separacionX += (this.x - otro.x) * fuerza;
-            separacionY += (this.y - otro.y) * fuerza;
+        //cambia de "caso" segun sea apropiado, cada caso tiene su condicion
+        switch (this.estado) {
+            case 'apareciendo':
+                break;
+            case 'idle':
+                this.logicaIdle(jugadorX, jugadorY, delta);
+                break;
+            case 'chase':
+                this.logicaChase(jugadorX, jugadorY, delta, otrosEnemigos);
+                break;
+            case 'atacar':
+                this.logicaAtacar(jugadorX, jugadorY, delta);
+                break;
         }
-    });
-
-    // Aplicar movimiento
-    let movX = (dirX * 0.7) + (separacionX * 2.5) + (Math.random() - 0.5) * 0.05;
-    let movY = (dirY * 0.7) + (separacionY * 2.5) + (Math.random() - 0.5) * 0.05;
-    let mag = Math.sqrt(movX * movX + movY * movY);
-    
-    this.x += (movX / (mag || 1)) * this.velocidad * delta;
-    this.y += (movY / (mag || 1)) * this.velocidad * delta;
-
-    // Voltear sprite
-    if (dx !== 0) {
-        const mirandoDerecha = dx > 0;
-        this.sprite.scale.x = (this.invertirX ? (mirandoDerecha ? -1 : 1) : (mirandoDerecha ? 1 : -1)) * this.escalaBase;
     }
-}
 
-// Método auxiliar para no repetir el Math.sqrt
-distanciaAlJugador(jx, jy) {
-    return Math.sqrt((jx - this.x)**2 + (jy - this.y)**2);
-}
+
+    ////////--------LOGICA DE ESTADOS--------////////////
+
+    logicaIdle(jugadorX, jugadorY, delta) {
+        this.cambiarAnimacion(this.texturasIdle);
+        // pasa de idle a persecucion si se acerca el jugador
+        const dist = this.distanciaAlJugador(jugadorX, jugadorY);
+        if (dist < 500) this.estado = 'chase';
+    }
+
+    logicaChase(jugadorX, jugadorY, delta, otrosEnemigos) {
+        this.cambiarAnimacion(this.texturasChase);
+        
+        //el enemigo va hacia el jugador
+        this.moverseHaciaJugador(jugadorX, jugadorY, delta, otrosEnemigos);
+
+        // si se acerca lo suficiente, el enemigo pasa a atacar
+        if (this.distanciaAlJugador(jugadorX, jugadorY) < 30) {
+            this.estado = 'atacar';
+        }
+    }
+
+    logicaAtacar(jugadorX, jugadorY, delta) {
+        // si el jugador se aleja, vuelve a perseguir
+        if (this.distanciaAlJugador(jugadorX, jugadorY) > 50) {
+            this.estado = 'chase';
+        }
+    }
+
+    //////////--------MOVIMIENTO--------///////////
+    moverseHaciaJugador(jugadorX, jugadorY, delta, otrosEnemigos) {
+        let dx = jugadorX - this.x;
+        let dy = jugadorY - this.y;
+        let distancia = Math.sqrt(dx * dx + dy * dy);
+
+        let dirX = dx / (distancia || 1);
+        let dirY = dy / (distancia || 1);
+        
+        // los enemigos toman una distancia entre si
+        let separacionX = 0, separacionY = 0;
+        let radioSeparacion = 55;
+        otrosEnemigos.forEach(otro => {
+            if (otro === this || otro.muerto || otro.apareciendo) return;
+            let dist = Math.sqrt((this.x - otro.x)**2 + (this.y - otro.y)**2);
+            if (dist < radioSeparacion) {
+                let fuerza = (radioSeparacion - dist) / radioSeparacion;
+                separacionX += (this.x - otro.x) * fuerza;
+                separacionY += (this.y - otro.y) * fuerza;
+            }
+        });
+
+        // movimiento
+        let movX = (dirX * 0.7) + (separacionX * 2.5) + (Math.random() - 0.5) * 0.05;
+        let movY = (dirY * 0.7) + (separacionY * 2.5) + (Math.random() - 0.5) * 0.05;
+        let mag = Math.sqrt(movX * movX + movY * movY);
+        
+        this.x += (movX / (mag || 1)) * this.velocidad * delta;
+        this.y += (movY / (mag || 1)) * this.velocidad * delta;
+
+        // se voltea el sprite
+        if (dx !== 0) {
+            const mirandoDerecha = dx > 0;
+            this.sprite.scale.x = (this.invertirX ? (mirandoDerecha ? -1 : 1) : (mirandoDerecha ? 1 : -1)) * this.escalaBase;
+        }
+    }
+
+    distanciaAlJugador(jx, jy) {
+        return Math.sqrt((jx - this.x)**2 + (jy - this.y)**2);
+    }
 
     cambiarAnimacion(nuevasTexturas) {
-    if (!nuevasTexturas || nuevasTexturas.length === 0 || this.sprite.textures === nuevasTexturas) {
-        return;
-    }
+        if (!nuevasTexturas || nuevasTexturas.length === 0 || this.sprite.textures === nuevasTexturas) {
+            return;
+        }
 
-    this.sprite.textures = nuevasTexturas;
-    
-    // Aca forcé a que el enemigo use la velocidad de las stats. Mas por un error que tenia que por otra cosa
-    this.sprite.animationSpeed = this.animSpeedBase || 0.1;
-    
-    this.sprite.play();
-}   
+        this.sprite.textures = nuevasTexturas;
+        
+        // aca termine forzando a que el enemigo use la velocidad de las stats. Mas por un error que tenia que por otra cosa
+        this.sprite.animationSpeed = this.animSpeedBase || 0.1;
+        
+        this.sprite.play();
+    }   
+
+    //////////-------------FUNCIONES-----------/////////////
 
     recibirDanio(cantidad) {
         if (this.muerto || this.apareciendo) return;
@@ -237,14 +242,14 @@ distanciaAlJugador(jx, jy) {
         this.sprite.onComplete = null; 
         this.sprite.loop = false;
         
-        // Logica para que el jefe dropee un item aleatorio
+        // si muere un jefe tira un item aleatorio
         if (this.esJefe) {
             if (window.juego && typeof window.juego.dropearItemAleatorio === "function") {
                 window.juego.dropearItemAleatorio();
             }
         }
 
-        // Te da xp
+        // da experiencia
         if (window.juego) window.juego.ganarXP(this.xpOtorga); 
         
         if (this.texturasMuerte.length > 0) {

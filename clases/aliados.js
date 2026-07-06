@@ -1,25 +1,20 @@
-// Aliados.js
-
-// --- CLASE BASE PARA CUALQUIER COMPAÑERO ---
 class Aliado extends PIXI.Container {
     constructor(juego, radioOrbita = 60, velocidadGiro = 0.03) {
         super();
         this.juego = juego;
         this.jugador = juego.jugador;
 
-        // Propiedades de movimiento (órbita)
-        this.anguloOrbita = Math.random() * Math.PI * 2; // Ángulo inicial aleatorio
+        // movimietno de la órbita
+        this.anguloOrbita = Math.random() * Math.PI * 2; // arranca en un angulo aleatorio
         this.radioOrbita = radioOrbita;
         this.velocidadGiro = velocidadGiro;
-
-        // Añadir automáticamente al contenedor del mapa
         this.juego.mundo.addChild(this);
     }
 
     actualizarOrbita(delta) {
         if (!this.jugador || this.jugador.muerto) return;
 
-        // Hace que gire en círculos alrededor del jugador
+        //el aliado orbita alrededor del jugador
         this.anguloOrbita += this.velocidadGiro * delta;
         this.x = this.jugador.x + Math.cos(this.anguloOrbita) * this.radioOrbita;
         this.y = this.jugador.y + Math.sin(this.anguloOrbita) * this.radioOrbita;
@@ -56,8 +51,8 @@ class PalomaAliada extends Aliado {
             if (texturasAnimacion.length > 0) {
                 this.sprite = new PIXI.AnimatedSprite(texturasAnimacion);
                 this.sprite.anchor.set(0.5);
-                this.sprite.animationSpeed = 0.20; // Velocidad del aleteo
-                this.sprite.scale.set(2);          // Escalado del sprite (ajustalo si queda muy grande/chico)
+                this.sprite.animationSpeed = 0.20; 
+                this.sprite.scale.set(2);          
                 this.sprite.play();
                 this.addChild(this.sprite);
                 console.log("¡Sprite de la paloma cargado perfectamente!");
@@ -68,27 +63,25 @@ class PalomaAliada extends Aliado {
             console.error("ERROR: No se recibió un spritesheet válido en la Paloma.");
         }
 
-        // Balance de combate
+        // propiedades del disparo de la paloma
         this.cooldownDisparo = 1500; 
         this.timerDisparo = 0;
         this.rangoAtaque = 350;
     }
 
     update(delta) {
-        // 1. Moverse en órbita usando la función de la clase padre
         this.actualizarOrbita(delta);
 
-        // 🔄 Rotación del sprite (Voltear según la dirección del giro)
+        // el sprite gira segun a que lado mire
         if (this.sprite) {
             const velocidadX = Math.cos(this.anguloOrbita);
             if (velocidadX < 0) {
-                this.sprite.scale.x = -Math.abs(this.sprite.scale.y); // Mira a la izquierda
+                this.sprite.scale.x = -Math.abs(this.sprite.scale.y); 
             } else {
-                this.sprite.scale.x = Math.abs(this.sprite.scale.y);  // Mira a la derecha
+                this.sprite.scale.x = Math.abs(this.sprite.scale.y);  
             }
         }
 
-        // 2. Lógica de ataque
         this.timerDisparo += this.juego.pixiApp.ticker.elapsedMS;
 
         if (this.timerDisparo >= this.cooldownDisparo) {
@@ -102,20 +95,18 @@ class PalomaAliada extends Aliado {
     }
 
     atacar(enemigo) {
-        // 1. Calculamos el ángulo exacto hacia el enemigo
+        // fija un angulo segun la ubicacion del enemigo
         const dx = enemigo.x - this.x;
         const dy = enemigo.y - this.y;
         const angulo = Math.atan2(dy, dx);
 
-        // 2. Definimos los componentes de dirección requeridos por tu constructor de Bala
+        // juntamos datos sobre la bala
         const dirX = Math.cos(angulo);
         const dirY = Math.sin(angulo);
 
-        // 3. Daño de la paloma
         const danioPaloma = 1; 
 
-        // 4. Instanciamos la bala respetando el orden exacto de tu constructor
-        if (typeof Bala === 'function') {
+        if (typeof Bala === 'function') {        // usamos el constructor para crear instancia de Bala
             const nuevaBala = new Bala(
                 this.x, 
                 this.y, 
@@ -126,14 +117,13 @@ class PalomaAliada extends Aliado {
                 this.juego.texturasBalas
             ); 
 
-            // 5. La agregamos al contenedor del mapa y al array global del bucle de colisiones
             this.juego.mundo.addChild(nuevaBala);
             this.juego.balas.push(nuevaBala);
         }
 
-        // Fx de audio
+        
         if (this.juego.sonidos) {
-            this.juego.sonidos.reproducir('disparo');
+            this.juego.sonidos.reproducir('disparo');// sonido del disparo
         }
     }
 }
